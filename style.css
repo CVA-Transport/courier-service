@@ -93,7 +93,7 @@ body{
 }
 
 /* Layout */
-.stack{ display:grid; gap: 14px; }
+.stack{ display:grid; gap: 30px; }
 
 .card{
   border: 1px solid var(--border);
