@@ -56,13 +56,27 @@
           </div>
 
           <div class="kvGrid">
+            <!-- ✅ Contract to + simple copy -->
             <div class="kv">
               <div class="k">Contract to</div>
-              <div class="v">Pierre Spencer</div>
+
+              <div class="v" id="contractTo" style="display:flex; align-items:center; gap:10px;">
+                Pierre Spencer
+                <span
+                  id="copyContractTo"
+                  role="button"
+                  tabindex="0"
+                  title="Copy"
+                  style="cursor:pointer; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color: rgba(216,192,140,.95); user-select:none;"
+                >
+                  Copy
+                </span>
+              </div>
             </div>
+
             <div class="kv">
               <div class="k">Collateral</div>
-              <div class="v">5B ISK</div>
+              <div class="v">5B ISK (maximum)</div>
             </div>
             <div class="kv">
               <div class="k">Time to accept</div>
@@ -180,6 +194,26 @@
         });
 
         sync();
+      });
+    })();
+
+    // Simple copy for "Contract to"
+    (function () {
+      const btn = document.getElementById("copyContractTo");
+      const el = document.getElementById("contractTo");
+      if (!btn || !el) return;
+
+      const copy = async () => {
+        const text = "Pierre Spencer";
+        try { await navigator.clipboard.writeText(text); }
+        catch { try { document.execCommand("copy"); } catch(e) {} }
+        btn.textContent = "Copied";
+        setTimeout(() => (btn.textContent = "Copy"), 900);
+      };
+
+      btn.addEventListener("click", copy);
+      btn.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") copy();
       });
     })();
   </script>
