@@ -114,12 +114,27 @@
 
               <div class="fieldHint">Ex: “KBP7-G - Heir of Athra”</div>
 
-              <!-- Dropdown (EN FLOW, pas en absolute) -->
+              <!-- Dropdown (en flow) -->
               <div class="dd" data-dd>
                 <div class="ddPanel">
                   <div class="ddList" data-dd-list role="listbox" aria-label="Pick up station list">
+                    <!-- 4 premières visibles par défaut (hauteur), puis scroll -->
                     <button class="ddItem" type="button" data-value="Amarr VIII - Emperor Family Academy">Amarr VIII - Emperor Family Academy</button>
                     <button class="ddItem" type="button" data-value="Jita 4.4 - Caldary Navy Assembly Plant">Jita 4.4 - Caldary Navy Assembly Plant</button>
+                    <button class="ddItem" type="button" data-value="Dodixie IX - Federation Navy Assembly Plant">Dodixie IX - Federation Navy Assembly Plant</button>
+                    <button class="ddItem" type="button" data-value="Rens VI - Brutor Tribe Treasury">Rens VI - Brutor Tribe Treasury</button>
+
+                    <!-- exemples en plus pour tester scroll -->
+                    <button class="ddItem" type="button" data-value="Hek VIII - Boundless Creation Factory">Hek VIII - Boundless Creation Factory</button>
+                    <button class="ddItem" type="button" data-value="Perimeter - Tranquility Trading Tower">Perimeter - Tranquility Trading Tower</button>
+                    <button class="ddItem" type="button" data-value="Amarr VIII (Oris) - Emperor Family Academy">Amarr VIII (Oris) - Emperor Family Academy</button>
+                    <button class="ddItem" type="button" data-value="Jita IV - Moon 4 (alt)">Jita IV - Moon 4 (alt)</button>
+                  </div>
+
+                  <!-- petits boutons scroll -->
+                  <div class="ddControls" aria-hidden="true">
+                    <button class="ddScroll" type="button" data-dd-up aria-label="Scroll up">▲</button>
+                    <button class="ddScroll" type="button" data-dd-down aria-label="Scroll down">▼</button>
                   </div>
                 </div>
               </div>
@@ -156,18 +171,52 @@
 
               <div class="fieldHint">Ex: “XHQ-7V - CVA Immortalis”</div>
 
-              <!-- Dropdown (EN FLOW, pas en absolute) -->
+              <!-- Dropdown (en flow) -->
               <div class="dd" data-dd>
                 <div class="ddPanel">
                   <div class="ddList" data-dd-list role="listbox" aria-label="Destination list">
                     <button class="ddItem" type="button" data-value="Amarr VIII - Emperor Family Academy">Amarr VIII - Emperor Family Academy</button>
                     <button class="ddItem" type="button" data-value="Jita 4.4 - Caldary Navy Assembly Plant">Jita 4.4 - Caldary Navy Assembly Plant</button>
+                    <button class="ddItem" type="button" data-value="Dodixie IX - Federation Navy Assembly Plant">Dodixie IX - Federation Navy Assembly Plant</button>
+                    <button class="ddItem" type="button" data-value="Rens VI - Brutor Tribe Treasury">Rens VI - Brutor Tribe Treasury</button>
+
+                    <button class="ddItem" type="button" data-value="Hek VIII - Boundless Creation Factory">Hek VIII - Boundless Creation Factory</button>
+                    <button class="ddItem" type="button" data-value="Perimeter - Tranquility Trading Tower">Perimeter - Tranquility Trading Tower</button>
+                    <button class="ddItem" type="button" data-value="Amarr VIII (Oris) - Emperor Family Academy">Amarr VIII (Oris) - Emperor Family Academy</button>
+                    <button class="ddItem" type="button" data-value="Jita IV - Moon 4 (alt)">Jita IV - Moon 4 (alt)</button>
+                  </div>
+
+                  <div class="ddControls" aria-hidden="true">
+                    <button class="ddScroll" type="button" data-dd-up aria-label="Scroll up">▲</button>
+                    <button class="ddScroll" type="button" data-dd-down aria-label="Scroll down">▼</button>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
+        </div>
+
+        <!-- Quote / Validate -->
+        <div class="card quoteCard" aria-label="Quote validation">
+          <div class="quoteTop">
+            <div>
+              <div class="sectionTitle">Quote</div>
+              <div class="quoteHint">Select pick up + destination, then validate.</div>
+            </div>
+
+            <button id="validateQuote" class="primaryBtn" type="button" disabled>
+              Validate
+            </button>
+          </div>
+
+          <div class="priceRow" id="priceRow" hidden>
+            <div class="priceLabel">Price</div>
+            <div class="priceValue">
+              <span id="priceText">—</span>
+              <button id="copyPrice" class="linkBtn" type="button" title="Copy amount" disabled>Copy</button>
+            </div>
+          </div>
         </div>
 
         <!-- Coming soon -->
@@ -180,7 +229,30 @@
   </main>
 
   <script>
-    // Clear button only when input has value
+    // --- Helpers ---
+    const copyToClipboard = async (text) => {
+      try { await navigator.clipboard.writeText(text); return true; }
+      catch {
+        try { document.execCommand("copy"); return true; }
+        catch(e){ return false; }
+      }
+    };
+
+    const bindCopyButton = (btn, getText) => {
+      if (!btn) return;
+      const original = btn.textContent;
+
+      btn.addEventListener("click", async () => {
+        const text = typeof getText === "function" ? getText() : String(getText || "");
+        if (!text) return;
+
+        const ok = await copyToClipboard(text);
+        btn.textContent = ok ? "Copied" : "Copy";
+        setTimeout(() => (btn.textContent = original), 900);
+      });
+    };
+
+    // --- Clear buttons visibility ---
     (function () {
       const fields = document.querySelectorAll("[data-field]");
       fields.forEach(field => {
@@ -198,29 +270,21 @@
           input.value = "";
           sync();
           input.focus();
+          // trigger validation state update
+          input.dispatchEvent(new Event("input", { bubbles: true }));
         });
 
         sync();
       });
     })();
 
-    // Copy "Contract to"
+    // --- Copy "Contract to" ---
     (function () {
       const btn = document.getElementById("copyContractTo");
-      if (!btn) return;
-
-      const copy = async () => {
-        const text = "Pierre Spencer";
-        try { await navigator.clipboard.writeText(text); }
-        catch { try { document.execCommand("copy"); } catch(e) {} }
-        btn.textContent = "Copied";
-        setTimeout(() => (btn.textContent = "Copy"), 900);
-      };
-
-      btn.addEventListener("click", copy);
+      bindCopyButton(btn, () => "Pierre Spencer");
     })();
 
-    // Dropdowns: simple + fiable (le dropdown pousse la page, pas de z-index war)
+    // --- Dropdowns (one open at a time) + filter + scroll buttons ---
     (function () {
       const fields = Array.from(document.querySelectorAll("[data-dropdown-field]"));
 
@@ -228,15 +292,29 @@
         fields.forEach(f => { if (f !== except) f.classList.remove("ddOpen"); });
       };
 
+      const setScrollBtnState = (list, upBtn, downBtn) => {
+        if (!list || !upBtn || !downBtn) return;
+        const atTop = list.scrollTop <= 0;
+        const atBottom = list.scrollTop + list.clientHeight >= list.scrollHeight - 1;
+        upBtn.disabled = atTop;
+        downBtn.disabled = atBottom;
+      };
+
       fields.forEach(field => {
         const input = field.querySelector(".fieldInput");
         const items = Array.from(field.querySelectorAll(".ddItem"));
-        if (!input) return;
+        const list  = field.querySelector("[data-dd-list]");
+        const upBtn = field.querySelector("[data-dd-up]");
+        const downBtn = field.querySelector("[data-dd-down]");
+        if (!input || !list) return;
 
         const open = () => {
           closeAll(field);
           field.classList.add("ddOpen");
+          // reset scroll buttons state
+          setScrollBtnState(list, upBtn, downBtn);
         };
+
         const close = () => field.classList.remove("ddOpen");
 
         const filter = () => {
@@ -245,6 +323,8 @@
             const t = (btn.dataset.value || btn.textContent || "").toLowerCase();
             btn.style.display = (!q || t.includes(q)) ? "" : "none";
           });
+          // after filtering, adjust scroll state
+          requestAnimationFrame(() => setScrollBtnState(list, upBtn, downBtn));
         };
 
         // Click anywhere in the field => focus + open
@@ -264,6 +344,7 @@
         input.addEventListener("focus", () => { open(); filter(); });
         input.addEventListener("input", () => { open(); filter(); });
 
+        // Pick item
         items.forEach(btn => {
           btn.addEventListener("click", () => {
             input.value = btn.dataset.value || btn.textContent.trim();
@@ -272,17 +353,88 @@
           });
         });
 
+        // Scroll buttons
+        const step = 160; // ~4 lignes / feeling simple
+        if (upBtn) upBtn.addEventListener("click", () => {
+          list.scrollBy({ top: -step, behavior: "smooth" });
+        });
+        if (downBtn) downBtn.addEventListener("click", () => {
+          list.scrollBy({ top: step, behavior: "smooth" });
+        });
+
+        list.addEventListener("scroll", () => setScrollBtnState(list, upBtn, downBtn));
+
         input.addEventListener("keydown", (e) => {
           if (e.key === "Escape") close();
           if (e.key === "ArrowDown") { open(); filter(); }
         });
       });
 
+      // Close when clicking outside
       document.addEventListener("pointerdown", (e) => {
         if (!e.target.closest("[data-dropdown-field]")) {
           fields.forEach(f => f.classList.remove("ddOpen"));
         }
       });
+    })();
+
+    // --- Validate button + Price display ---
+    (function () {
+      const pickup = document.getElementById("pickup");
+      const destination = document.getElementById("destination");
+
+      const validateBtn = document.getElementById("validateQuote");
+      const priceRow = document.getElementById("priceRow");
+      const priceText = document.getElementById("priceText");
+      const copyPriceBtn = document.getElementById("copyPrice");
+
+      if (!pickup || !destination || !validateBtn || !priceRow || !priceText || !copyPriceBtn) return;
+
+      const normalize = (s) => (s || "").trim().toLowerCase();
+      const isAmarrJita = (a, b) => {
+        const A = normalize(a);
+        const B = normalize(b);
+        const amarr = A.includes("amarr") || B.includes("amarr");
+        const jita  = A.includes("jita")  || B.includes("jita");
+        return amarr && jita;
+      };
+
+      const syncValidate = () => {
+        const ok = pickup.value.trim().length > 0 && destination.value.trim().length > 0;
+        validateBtn.disabled = !ok;
+
+        // Si on modifie un champ après avoir affiché un prix, on masque (plus clean)
+        if (!ok) {
+          priceRow.hidden = true;
+          copyPriceBtn.disabled = true;
+        }
+      };
+
+      pickup.addEventListener("input", syncValidate);
+      destination.addEventListener("input", syncValidate);
+
+      validateBtn.addEventListener("click", () => {
+        if (validateBtn.disabled) return;
+
+        const p = pickup.value.trim();
+        const d = destination.value.trim();
+
+        // Prix demandé : Amarr <-> Jita
+        if (isAmarrJita(p, d)) {
+          priceText.textContent = "65 000 000 ISK";
+          copyPriceBtn.disabled = false;
+          // copie UNIQUEMENT le montant
+          bindCopyButton(copyPriceBtn, () => "65 000 000");
+        } else {
+          // si pas la route attendue, on reste propre
+          priceText.textContent = "Pricing unavailable";
+          copyPriceBtn.disabled = true;
+        }
+
+        priceRow.hidden = false;
+      });
+
+      syncValidate();
     })();
   </script>
 </body>
