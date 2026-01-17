@@ -1,24 +1,19 @@
-/* style.css — SIMPLE, PRO, GRIS UNI, ZERO BLUR / ZERO GRADIENT / ZERO SHADOW */
+/* style.css — gris premium + touches or, simple, propre */
 
 :root{
-  /* Fond gris premium UNI */
   --bg: #1b1d21;
 
-  /* Surfaces (gris) */
   --panel: #22252b;
   --card:  #262a31;
   --field: #1f2228;
   --dd:    #1c1f25;
 
-  /* Texte */
   --text:  #f2f3f5;
   --muted: rgba(242,243,245,.62);
 
-  /* Lignes */
   --border: rgba(255,255,255,.12);
   --border2: rgba(255,255,255,.18);
 
-  /* Accents */
   --gold:  #c9aa70;
   --gold2: #e0c68b;
   --green: #39d98a;
@@ -186,6 +181,7 @@ body{
   gap: 12px;
 }
 
+/* Buttons */
 .linkBtn{
   appearance:none;
   border: 1px solid rgba(201,170,112,.35);
@@ -200,9 +196,35 @@ body{
   cursor: pointer;
 }
 .linkBtn:active{ transform: translateY(1px); }
-.linkBtn:focus-visible{
-  outline: 2px solid rgba(224,198,139,.45);
-  outline-offset: 2px;
+.linkBtn:disabled{
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.primaryBtn{
+  appearance:none;
+  border: 1px solid rgba(201,170,112,.55);
+  background: rgba(201,170,112,.10);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity .12s ease, background .12s ease, border-color .12s ease;
+}
+.primaryBtn:hover{
+  background: rgba(201,170,112,.14);
+  border-color: rgba(201,170,112,.70);
+}
+.primaryBtn:active{ transform: translateY(1px); }
+.primaryBtn:disabled{
+  opacity: .45;
+  cursor: not-allowed;
+  background: rgba(255,255,255,.04);
+  border-color: rgba(255,255,255,.16);
 }
 
 /* Boxes */
@@ -210,6 +232,9 @@ body{
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 14px;
+
+  /* IMPORTANT: évite que l'autre colonne s'étire quand un dropdown s'ouvre */
+  align-items: start;
 }
 
 .box{
@@ -217,6 +242,9 @@ body{
   border-radius: var(--r);
   background: var(--card);
   padding: 14px;
+
+  /* IMPORTANT: chaque box garde sa hauteur */
+  align-self: start;
 }
 
 .boxLabel{
@@ -314,35 +342,35 @@ body{
   color: rgba(242,243,245,.80);
 }
 .field.hasValue .fieldClear{ display:flex; }
-.fieldClear:focus-visible{
-  outline: 2px solid rgba(224,198,139,.45);
-  outline-offset: 2px;
-}
 
-/* DROPDOWN — EN FLOW (donc impossible qu'il passe derrière le "coming soon") */
+/* Dropdown (en flow) */
 .dd{
   flex: 0 0 100%;
-  display:none;              /* fermé par défaut */
+  display:none;
   margin-top: 10px;
 }
-
 .field.ddOpen .dd{
   display:block;
 }
 
 .ddPanel{
+  position: relative;
   border: 1px solid var(--border);
   border-radius: var(--r2);
   background: var(--dd);
   overflow: hidden;
 }
 
+/* 4 items visibles par défaut */
 .ddList{
-  max-height: 320px;
+  max-height: 206px;        /* ~4 items + gaps */
   overflow: auto;
-  padding: 8px;
+  padding: 10px 44px 10px 10px; /* place pour boutons à droite */
+  display: grid;
+  gap: 8px;
 }
 
+/* Item */
 .ddItem{
   width: 100%;
   text-align: left;
@@ -354,7 +382,6 @@ body{
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
-  margin: 6px 0;
 
   white-space: nowrap;
   overflow: hidden;
@@ -362,6 +389,71 @@ body{
 }
 .ddItem:hover{
   border-color: rgba(201,170,112,.35);
+}
+
+/* Scroll controls (simple) */
+.ddControls{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  bottom: 10px;
+  display:flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: none; /* boutons reprennent */
+}
+.ddScroll{
+  pointer-events: auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: rgba(242,243,245,.78);
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+}
+.ddScroll:disabled{
+  opacity: .35;
+  cursor: not-allowed;
+}
+
+/* Quote card */
+.quoteTop{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 14px;
+}
+.quoteHint{
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.priceRow{
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,.10);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+}
+.priceLabel{
+  font-size: 12px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.priceValue{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 /* Coming soon */
@@ -386,6 +478,13 @@ body{
   .statusPill{
     width: 100%;
     justify-content:center;
+  }
+  .quoteTop{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .primaryBtn{
+    width: 100%;
   }
   .fieldHint{ display:none; }
 }
