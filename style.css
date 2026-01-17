@@ -1,12 +1,13 @@
-/* style.css — gris premium + touches or, simple, propre */
-
 :root{
   --bg: #1b1d21;
 
   --panel: #22252b;
   --card:  #262a31;
   --field: #1f2228;
-  --dd:    #1c1f25;
+
+  /* dropdown */
+  --dd: #1c1f25;
+  --dd2: #171a20;
 
   --text:  #f2f3f5;
   --muted: rgba(242,243,245,.62);
@@ -232,9 +233,8 @@ body{
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 14px;
-
-  /* IMPORTANT: évite que l'autre colonne s'étire quand un dropdown s'ouvre */
-  align-items: start;
+  align-items: start; /* évite la "même hauteur" quand un dropdown s'ouvre */
+  position: relative;
 }
 
 .box{
@@ -242,10 +242,10 @@ body{
   border-radius: var(--r);
   background: var(--card);
   padding: 14px;
-
-  /* IMPORTANT: chaque box garde sa hauteur */
-  align-self: start;
+  position: relative;
+  z-index: 1;
 }
+.box:focus-within{ z-index: 20; }
 
 .boxLabel{
   display:flex;
@@ -272,16 +272,20 @@ body{
   background: transparent;
 }
 
-/* Field */
+/* Field (layout type EVE: icon + value + caret) */
 .field{
+  position: relative;
   border: 1px solid var(--border2);
   border-radius: var(--r2);
   background: var(--field);
   padding: 12px;
-  display:flex;
-  align-items:center;
-  gap: 10px;
-  flex-wrap: wrap;
+
+  display: grid;
+  grid-template-columns: 18px 1fr auto auto;
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  row-gap: 6px;
+
   cursor: text;
 }
 .field:focus-within{
@@ -292,12 +296,15 @@ body{
   width: 18px;
   height: 18px;
   color: rgba(242,243,245,.80);
-  flex: 0 0 auto;
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
 }
 
 .fieldInput{
-  flex: 1 1 220px;
-  min-width: 160px;
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 140px;
   background: transparent;
   border: 0;
   outline: none;
@@ -312,9 +319,8 @@ body{
 }
 
 .fieldHint{
-  flex: 0 0 100%;
-  margin-left: 28px;
-  margin-top: 2px;
+  grid-column: 2 / -1;
+  grid-row: 2;
   font-size: 10px;
   letter-spacing: .18em;
   text-transform: uppercase;
@@ -326,6 +332,8 @@ body{
 }
 
 .fieldClear{
+  grid-column: 3;
+  grid-row: 1;
   display:none;
   width: 32px;
   height: 32px;
@@ -343,81 +351,172 @@ body{
 }
 .field.hasValue .fieldClear{ display:flex; }
 
-/* Dropdown (en flow) */
+.fieldToggle{
+  grid-column: 4;
+  grid-row: 1;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: rgba(242,243,245,.75);
+  cursor: pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.fieldToggle svg{ width: 18px; height: 18px; }
+.field.ddOpen .fieldToggle svg{ transform: rotate(180deg); }
+
+/* Dropdown overlay */
 .dd{
-  flex: 0 0 100%;
-  display:none;
-  margin-top: 10px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 8px);
+  display: none;
+  z-index: 30;
 }
-.field.ddOpen .dd{
-  display:block;
-}
+.field.ddOpen .dd{ display:block; }
 
 .ddPanel{
-  position: relative;
   border: 1px solid var(--border);
-  border-radius: var(--r2);
+  border-radius: 12px;
   background: var(--dd);
   overflow: hidden;
 }
 
-/* 4 items visibles par défaut */
-.ddList{
-  max-height: 206px;        /* ~4 items + gaps */
-  overflow: auto;
-  padding: 10px 44px 10px 10px; /* place pour boutons à droite */
-  display: grid;
-  gap: 8px;
+/* Search row */
+.ddSearch{
+  padding: 10px;
+  border-bottom: 1px solid rgba(255,255,255,.10);
+  background: var(--dd2);
 }
-
-/* Item */
-.ddItem{
+.ddSearchWrap{
+  position: relative;
+}
+.ddSearchInput{
   width: 100%;
-  text-align: left;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255,255,255,.12);
   background: transparent;
   color: var(--text);
   border-radius: 10px;
-  padding: 12px;
+  padding: 10px 36px 10px 10px;
+  outline: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+.ddSearchInput::placeholder{
+  color: rgba(242,243,245,.40);
+  font-weight: 500;
+}
+.ddSearchIcon{
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  color: rgba(242,243,245,.55);
+  pointer-events: none;
+}
+
+/* Body: list + custom scrollbar (thin gray only) + arrows */
+.ddBody{
+  display: grid;
+  grid-template-columns: 1fr 34px;
+}
+
+/* 4 items visibles (approx) */
+.ddList{
+  height: 206px;
+  overflow: auto;
+  padding: 6px 6px;
+  display: block;
+
+  /* remove native scrollbar (so no white track) */
+  scrollbar-width: none; /* Firefox */
+}
+.ddList::-webkit-scrollbar{
+  width: 0;
+  height: 0;
+}
+
+.ddItem{
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  border-radius: 8px;
+  padding: 10px 10px;
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
+  line-height: 1.1;
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .ddItem:hover{
-  border-color: rgba(201,170,112,.35);
+  background: rgba(255,255,255,.06);
+}
+.ddItem.isSelected{
+  background: rgba(201,170,112,.12);
+  outline: 1px solid rgba(201,170,112,.28);
 }
 
-/* Scroll controls (simple) */
+/* Controls */
 .ddControls{
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  bottom: 10px;
+  padding: 6px 6px;
   display:flex;
   flex-direction: column;
+  align-items:center;
   justify-content: space-between;
   gap: 8px;
-  pointer-events: none; /* boutons reprennent */
+  background: var(--dd2);
+  border-left: 1px solid rgba(255,255,255,.08);
 }
+
 .ddScroll{
-  pointer-events: auto;
   width: 28px;
   height: 28px;
   border-radius: 10px;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255,255,255,.12);
   background: transparent;
-  color: rgba(242,243,245,.78);
+  color: rgba(242,243,245,.70);
   cursor: pointer;
-  font-size: 12px;
-  line-height: 1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
+.ddScroll svg{ width: 16px; height: 16px; }
 .ddScroll:disabled{
   opacity: .35;
   cursor: not-allowed;
+}
+
+.ddRail{
+  flex: 1 1 auto;
+  width: 6px;
+  border-radius: 999px;
+  position: relative;
+  margin: 6px 0;
+  background: transparent; /* pas de track visible */
+}
+.ddThumb{
+  position: absolute;
+  left: 50%;
+  width: 4px;
+  border-radius: 999px;
+  background: rgba(242,243,245,.38);
+  transform: translateX(-50%);
+  height: 18px;
+}
+
+.ddControls:not(.isScrollable) .ddThumb{
+  display:none;
 }
 
 /* Quote card */
