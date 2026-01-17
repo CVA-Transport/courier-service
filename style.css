@@ -216,7 +216,7 @@ header{
 
 /* Main panel area */
 .panel{
-  margin-top: 22px;
+  margin-top: 50px;
   padding: 22px;
   border-radius: var(--radius);
   border: 1px solid var(--stroke);
