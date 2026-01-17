@@ -114,18 +114,12 @@
 
               <div class="fieldHint">Ex: “KBP7-G - Heir of Athra”</div>
 
+              <!-- Dropdown (EN FLOW, pas en absolute) -->
               <div class="dd" data-dd>
                 <div class="ddPanel">
                   <div class="ddList" data-dd-list role="listbox" aria-label="Pick up station list">
                     <button class="ddItem" type="button" data-value="Amarr VIII - Emperor Family Academy">Amarr VIII - Emperor Family Academy</button>
                     <button class="ddItem" type="button" data-value="Jita 4.4 - Caldary Navy Assembly Plant">Jita 4.4 - Caldary Navy Assembly Plant</button>
-                  </div>
-
-                  <!-- gardé mais masqué en CSS -->
-                  <div class="ddControls" aria-hidden="true">
-                    <button class="ddScroll" type="button" data-dd-up title="Scroll up">▲</button>
-                    <div class="ddTrack"><div class="ddThumb"></div></div>
-                    <button class="ddScroll" type="button" data-dd-down title="Scroll down">▼</button>
                   </div>
                 </div>
               </div>
@@ -162,18 +156,12 @@
 
               <div class="fieldHint">Ex: “XHQ-7V - CVA Immortalis”</div>
 
+              <!-- Dropdown (EN FLOW, pas en absolute) -->
               <div class="dd" data-dd>
                 <div class="ddPanel">
                   <div class="ddList" data-dd-list role="listbox" aria-label="Destination list">
                     <button class="ddItem" type="button" data-value="Amarr VIII - Emperor Family Academy">Amarr VIII - Emperor Family Academy</button>
                     <button class="ddItem" type="button" data-value="Jita 4.4 - Caldary Navy Assembly Plant">Jita 4.4 - Caldary Navy Assembly Plant</button>
-                  </div>
-
-                  <!-- gardé mais masqué en CSS -->
-                  <div class="ddControls" aria-hidden="true">
-                    <button class="ddScroll" type="button" data-dd-up title="Scroll up">▲</button>
-                    <div class="ddTrack"><div class="ddThumb"></div></div>
-                    <button class="ddScroll" type="button" data-dd-down title="Scroll down">▼</button>
                   </div>
                 </div>
               </div>
@@ -192,7 +180,7 @@
   </main>
 
   <script>
-    // Show clear button only when input has value
+    // Clear button only when input has value
     (function () {
       const fields = document.querySelectorAll("[data-field]");
       fields.forEach(field => {
@@ -232,14 +220,12 @@
       btn.addEventListener("click", copy);
     })();
 
-    // Dropdowns: simple, whole field clickable, black dropdown, flexible height
+    // Dropdowns: simple + fiable (le dropdown pousse la page, pas de z-index war)
     (function () {
       const fields = Array.from(document.querySelectorAll("[data-dropdown-field]"));
 
       const closeAll = (except) => {
-        fields.forEach(f => {
-          if (f !== except) f.classList.remove("ddOpen");
-        });
+        fields.forEach(f => { if (f !== except) f.classList.remove("ddOpen"); });
       };
 
       fields.forEach(field => {
@@ -261,17 +247,18 @@
           });
         };
 
-        // ✅ Cliquer n'importe où dans la zone (icône, fond, hint) => focus input + open
-        field.addEventListener("mousedown", (e) => {
+        // Click anywhere in the field => focus + open
+        field.addEventListener("pointerdown", (e) => {
           if (e.target.closest(".dd")) return;
           if (e.target.closest(".fieldClear")) return;
 
-          if (e.target !== input) {
-            e.preventDefault();
-            input.focus({ preventScroll: true });
-          }
           open();
           filter();
+
+          if (e.target !== input) {
+            e.preventDefault();
+            setTimeout(() => input.focus({ preventScroll: true }), 0);
+          }
         });
 
         input.addEventListener("focus", () => { open(); filter(); });
@@ -287,10 +274,11 @@
 
         input.addEventListener("keydown", (e) => {
           if (e.key === "Escape") close();
+          if (e.key === "ArrowDown") { open(); filter(); }
         });
       });
 
-      document.addEventListener("mousedown", (e) => {
+      document.addEventListener("pointerdown", (e) => {
         if (!e.target.closest("[data-dropdown-field]")) {
           fields.forEach(f => f.classList.remove("ddOpen"));
         }
