@@ -253,7 +253,7 @@ header{
   inset:0;
   border-radius: inherit;
   pointer-events:none;
-  opacity:.85;
+  opacity: 0;
   background:
     /* top-left */
     linear-gradient(to right, rgba(183,154,99,.40), transparent 70%) 18px 18px / 140px 1px no-repeat,
