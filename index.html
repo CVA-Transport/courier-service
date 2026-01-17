@@ -25,7 +25,6 @@
         <strong>WTFUG &amp; CVA</strong>
       </div>
 
-      <!-- title + underline (underline matches title width) -->
       <div class="titleBlock">
         <h1 class="title"><span class="titleText">Providence courier service</span></h1>
         <div class="titleLine" aria-hidden="true"></div>
@@ -56,7 +55,6 @@
           </div>
 
           <div class="kvGrid">
-            <!-- ✅ Contract to + simple copy -->
             <div class="kv">
               <div class="k">Contract to</div>
 
@@ -100,13 +98,14 @@
 
         <!-- Pick up / Destination -->
         <div class="boxes">
+          <!-- PICK UP -->
           <div class="box">
             <div class="boxLabel">
               <span>Pick up station</span>
               <div class="tag">Origin</div>
             </div>
 
-            <div class="field" data-field>
+            <div class="field" data-field data-dropdown-field>
               <svg class="fieldIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11Z" stroke="currentColor" stroke-width="1.6"/>
                 <path d="M12 12.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z" stroke="currentColor" stroke-width="1.6"/>
@@ -128,16 +127,33 @@
               </button>
 
               <div class="fieldHint">Ex: “KBP7-G - Heir of Athra”</div>
+
+              <!-- Dropdown (same structure as destination) -->
+              <div class="dd" data-dd>
+                <div class="ddPanel">
+                  <div class="ddList" data-dd-list role="listbox" aria-label="Pick up station list">
+                    <button class="ddItem" type="button" data-value="Amarr VIII - Emperor Family Academy">Amarr VIII - Emperor Family Academy</button>
+                    <button class="ddItem" type="button" data-value="Jita 4.4 - Caldary Navy Assembly Plant">Jita 4.4 - Caldary Navy Assembly Plant</button>
+                  </div>
+
+                  <div class="ddControls" aria-hidden="true">
+                    <button class="ddScroll" type="button" data-dd-up title="Scroll up">▲</button>
+                    <div class="ddTrack"><div class="ddThumb"></div></div>
+                    <button class="ddScroll" type="button" data-dd-down title="Scroll down">▼</button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
+          <!-- DESTINATION -->
           <div class="box">
             <div class="boxLabel">
               <span>Destination</span>
               <div class="tag">Drop</div>
             </div>
 
-            <div class="field" data-field>
+            <div class="field" data-field data-dropdown-field>
               <svg class="fieldIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M20 10.6c0 5.2-8 10.4-8 10.4S4 15.8 4 10.6a8 8 0 1 1 16 0Z" stroke="currentColor" stroke-width="1.6"/>
                 <path d="M12 12.4a2.6 2.6 0 1 0 0-5.2 2.6 2.6 0 0 0 0 5.2Z" stroke="currentColor" stroke-width="1.6"/>
@@ -159,6 +175,22 @@
               </button>
 
               <div class="fieldHint">Ex: “XHQ-7V - CVA Immortalis”</div>
+
+              <!-- Dropdown (same structure as pick up) -->
+              <div class="dd" data-dd>
+                <div class="ddPanel">
+                  <div class="ddList" data-dd-list role="listbox" aria-label="Destination list">
+                    <button class="ddItem" type="button" data-value="Amarr VIII - Emperor Family Academy">Amarr VIII - Emperor Family Academy</button>
+                    <button class="ddItem" type="button" data-value="Jita 4.4 - Caldary Navy Assembly Plant">Jita 4.4 - Caldary Navy Assembly Plant</button>
+                  </div>
+
+                  <div class="ddControls" aria-hidden="true">
+                    <button class="ddScroll" type="button" data-dd-up title="Scroll up">▲</button>
+                    <div class="ddTrack"><div class="ddThumb"></div></div>
+                    <button class="ddScroll" type="button" data-dd-down title="Scroll down">▼</button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -200,8 +232,7 @@
     // Simple copy for "Contract to"
     (function () {
       const btn = document.getElementById("copyContractTo");
-      const el = document.getElementById("contractTo");
-      if (!btn || !el) return;
+      if (!btn) return;
 
       const copy = async () => {
         const text = "Pierre Spencer";
@@ -214,6 +245,77 @@
       btn.addEventListener("click", copy);
       btn.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") copy();
+      });
+    })();
+
+    // Dropdowns for Pick up / Destination (simple, elegant, scrollable)
+    (function () {
+      const fields = document.querySelectorAll("[data-dropdown-field]");
+
+      const closeAll = () => fields.forEach(f => f.classList.remove("ddOpen"));
+
+      const updateThumb = (list, thumb) => {
+        if (!list || !thumb) return;
+        const maxScroll = Math.max(1, list.scrollHeight - list.clientHeight);
+        const ratio = list.clientHeight / Math.max(1, list.scrollHeight);
+        const h = Math.max(22, Math.floor(list.clientHeight * ratio));
+        const top = Math.floor((list.scrollTop / maxScroll) * (list.clientHeight - h));
+        thumb.style.height = h + "px";
+        thumb.style.transform = "translateY(" + top + "px)";
+      };
+
+      fields.forEach(field => {
+        const input = field.querySelector(".fieldInput");
+        const dd = field.querySelector("[data-dd]");
+        const list = field.querySelector("[data-dd-list]");
+        const items = Array.from(field.querySelectorAll(".ddItem"));
+        const up = field.querySelector("[data-dd-up]");
+        const down = field.querySelector("[data-dd-down]");
+        const thumb = field.querySelector(".ddThumb");
+
+        const open = () => {
+          closeAll();
+          field.classList.add("ddOpen");
+          updateThumb(list, thumb);
+        };
+
+        const filter = () => {
+          const q = input.value.trim().toLowerCase();
+          items.forEach(btn => {
+            const t = (btn.dataset.value || btn.textContent || "").toLowerCase();
+            btn.style.display = !q || t.includes(q) ? "" : "none";
+          });
+          updateThumb(list, thumb);
+        };
+
+        // Open on click/focus
+        input.addEventListener("focus", () => { open(); filter(); });
+        input.addEventListener("click",  () => { open(); filter(); });
+        input.addEventListener("input",  () => { open(); filter(); });
+
+        // Pick item
+        items.forEach(btn => {
+          btn.addEventListener("click", () => {
+            input.value = btn.dataset.value || btn.textContent.trim();
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+            field.classList.remove("ddOpen");
+          });
+        });
+
+        // Scroll buttons
+        const step = 90;
+        if (up) up.addEventListener("click", () => { list.scrollBy({ top: -step, behavior: "smooth" }); });
+        if (down) down.addEventListener("click", () => { list.scrollBy({ top: step, behavior: "smooth" }); });
+
+        // Keep thumb synced
+        list.addEventListener("scroll", () => updateThumb(list, thumb));
+        window.addEventListener("resize", () => updateThumb(list, thumb));
+      });
+
+      // Close when clicking outside
+      document.addEventListener("mousedown", (e) => {
+        const inside = e.target.closest("[data-dropdown-field]");
+        if (!inside) closeAll();
       });
     })();
   </script>
