@@ -97,7 +97,6 @@
                 <path d="M12 12.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z" stroke="currentColor" stroke-width="1.6"/>
               </svg>
 
-              <!-- ✅ Readonly: plus de recherche ici -->
               <input
                 class="fieldInput"
                 id="pickup"
@@ -122,7 +121,6 @@
                 </svg>
               </button>
 
-              <!-- Dropdown -->
               <div class="dd" data-dd>
                 <div class="ddPanel" role="listbox" aria-label="Pick up station list">
                   <div class="ddSearch">
@@ -138,7 +136,6 @@
                   <div class="ddBody">
                     <div class="ddList" data-dd-list>
 
-                      <!-- ✅ Alliance categories -->
                       <div class="ddGroup" data-group="cva">
                         <div class="ddGroupTitle">Curatores Veritatis Alliance</div>
                         <div class="ddEmpty">No locations yet</div>
@@ -152,12 +149,10 @@
                       <div class="ddGroup" data-group="npc">
                         <div class="ddGroupTitle">NPC Space</div>
 
-                        <!-- ✅ contenu inchangé (tes entrées actuelles) -->
                         <button class="ddItem" type="button" data-value="Amarr VIII - Emperor Family Academy">Amarr VIII - Emperor Family Academy</button>
                         <button class="ddItem" type="button" data-value="Jita 4.4 - Caldary Navy Assembly Plant">Jita 4.4 - Caldary Navy Assembly Plant</button>
                         <button class="ddItem" type="button" data-value="Dodixie IX - Federation Navy Assembly Plant">Dodixie IX - Federation Navy Assembly Plant</button>
                         <button class="ddItem" type="button" data-value="Rens VI - Brutor Tribe Treasury">Rens VI - Brutor Tribe Treasury</button>
-
                         <button class="ddItem" type="button" data-value="Hek VIII - Boundless Creation Factory">Hek VIII - Boundless Creation Factory</button>
                         <button class="ddItem" type="button" data-value="Perimeter - Tranquility Trading Tower">Perimeter - Tranquility Trading Tower</button>
                         <button class="ddItem" type="button" data-value="Amarr VIII (Oris) - Emperor Family Academy">Amarr VIII (Oris) - Emperor Family Academy</button>
@@ -229,7 +224,6 @@
                 </svg>
               </button>
 
-              <!-- Dropdown -->
               <div class="dd" data-dd>
                 <div class="ddPanel" role="listbox" aria-label="Destination list">
                   <div class="ddSearch">
@@ -262,7 +256,6 @@
                         <button class="ddItem" type="button" data-value="Jita 4.4 - Caldary Navy Assembly Plant">Jita 4.4 - Caldary Navy Assembly Plant</button>
                         <button class="ddItem" type="button" data-value="Dodixie IX - Federation Navy Assembly Plant">Dodixie IX - Federation Navy Assembly Plant</button>
                         <button class="ddItem" type="button" data-value="Rens VI - Brutor Tribe Treasury">Rens VI - Brutor Tribe Treasury</button>
-
                         <button class="ddItem" type="button" data-value="Hek VIII - Boundless Creation Factory">Hek VIII - Boundless Creation Factory</button>
                         <button class="ddItem" type="button" data-value="Perimeter - Tranquility Trading Tower">Perimeter - Tranquility Trading Tower</button>
                         <button class="ddItem" type="button" data-value="Amarr VIII (Oris) - Emperor Family Academy">Amarr VIII (Oris) - Emperor Family Academy</button>
@@ -330,350 +323,21 @@
     </section>
   </main>
 
-  <script>
-    // --- Helpers ---
-    const copyToClipboard = async (text) => {
-      try { await navigator.clipboard.writeText(text); return true; }
-      catch {
-        try { document.execCommand("copy"); return true; }
-        catch(e){ return false; }
-      }
-    };
-
-    // Safe binding: avoid stacking multiple handlers if reused
-    const bindCopyButton = (btn, getText) => {
-      if (!btn) return;
-      if (btn.__boundCopy) return;
-      btn.__boundCopy = true;
-
-      btn.addEventListener("click", async () => {
-        if (btn.disabled) return;
-        const original = btn.__originalText || btn.textContent;
-        btn.__originalText = original;
-
-        const text = typeof getText === "function" ? getText() : String(getText || "");
-        if (!text) return;
-
-        const ok = await copyToClipboard(text);
-        btn.textContent = ok ? "Copied" : "Copy";
-        setTimeout(() => (btn.textContent = original), 900);
-      });
-    };
-
-    const norm = (s) => (s || "").trim().toLowerCase();
-
-    // --- Clear buttons visibility ---
-    (function () {
-      const fields = document.querySelectorAll("[data-field]");
-      fields.forEach(field => {
-        const input = field.querySelector(".fieldInput");
-        const clear = field.querySelector(".fieldClear");
-        const ddSearch = field.querySelector(".ddSearchInput");
-        if (!input || !clear) return;
-
-        const sync = () => field.classList.toggle("hasValue", input.value.trim().length > 0);
-
-        input.addEventListener("input", sync);
-        input.addEventListener("change", sync);
-
-        clear.addEventListener("click", (e) => {
-          e.stopPropagation();
-          input.value = "";
-          if (ddSearch) ddSearch.value = "";
-          sync();
-          input.dispatchEvent(new Event("input", { bubbles: true }));
-          if (ddSearch) ddSearch.dispatchEvent(new Event("input", { bubbles: true }));
-        });
-
-        sync();
-      });
-    })();
-
-    // --- Copy "Contract to" ---
-    (function () {
-      const btn = document.getElementById("copyContractTo");
-      bindCopyButton(btn, () => "Pierre Spencer");
-    })();
-
-    // --- Dropdowns + mutual exclusion + clean scrollbar thumb (no overlap) ---
-    (function () {
-      const fields = Array.from(document.querySelectorAll("[data-dropdown-field]"));
-      const pickup = document.getElementById("pickup");
-      const destination = document.getElementById("destination");
-
-      const closeAll = (except) => {
-        fields.forEach(f => { if (!except || f !== except) f.classList.remove("ddOpen"); });
-      };
-
-      const updateScrollUI = (list, rail, upBtn, downBtn, thumb, controls) => {
-        if (!list || !rail || !upBtn || !downBtn || !thumb || !controls) return;
-
-        const scrollable = list.scrollHeight > list.clientHeight + 1;
-        controls.classList.toggle("isScrollable", scrollable);
-
-        const atTop = list.scrollTop <= 0;
-        const atBottom = list.scrollTop + list.clientHeight >= list.scrollHeight - 1;
-        upBtn.disabled = !scrollable || atTop;
-        downBtn.disabled = !scrollable || atBottom;
-
-        if (!scrollable) {
-          thumb.style.height = "0px";
-          thumb.style.transform = "translateY(0px)";
-          return;
-        }
-
-        // ✅ IMPORTANT: thumb must be computed against rail height (not list height)
-        const railH = rail.clientHeight;
-        const maxScroll = Math.max(1, list.scrollHeight - list.clientHeight);
-
-        const ratio = list.clientHeight / Math.max(1, list.scrollHeight);
-        const h = Math.max(18, Math.floor(railH * ratio));
-        const top = Math.floor((list.scrollTop / maxScroll) * Math.max(0, railH - h));
-
-        thumb.style.height = h + "px";
-        thumb.style.transform = "translateY(" + top + "px)";
-      };
-
-      const refreshAllLists = () => {
-        const selectedPickup = norm(pickup?.value);
-        const selectedDest   = norm(destination?.value);
-
-        fields.forEach(field => {
-          const input = field.querySelector(".fieldInput");
-          const search = field.querySelector(".ddSearchInput");
-          const list  = field.querySelector("[data-dd-list]");
-          const upBtn = field.querySelector("[data-dd-up]");
-          const downBtn = field.querySelector("[data-dd-down]");
-          const rail = field.querySelector(".ddRail");
-          const thumb = field.querySelector(".ddThumb");
-          const controls = field.querySelector(".ddControls");
-          if (!input || !list) return;
-
-          const q = norm(search?.value);
-          const selfSelected = norm(input.value);
-
-          const forbid =
-            input.id === "pickup" ? selectedDest :
-            input.id === "destination" ? selectedPickup :
-            "";
-
-          const groups = Array.from(list.querySelectorAll(".ddGroup"));
-
-          groups.forEach(group => {
-            const items = Array.from(group.querySelectorAll(".ddItem"));
-            const empty = group.querySelector(".ddEmpty");
-
-            let visibleCount = 0;
-
-            items.forEach(btn => {
-              const v = norm(btn.dataset.value || btn.textContent || "");
-              const matchesQuery = !q || v.includes(q);
-
-              // Bloque l'item pris par l'autre champ, MAIS ne cache pas celui déjà sélectionné dans ce champ
-              const blocked = forbid && v === forbid && v !== selfSelected;
-
-              const visible = matchesQuery && !blocked;
-              btn.hidden = !visible;
-
-              const isSel = selfSelected && v === selfSelected;
-              btn.classList.toggle("isSelected", isSel);
-              btn.setAttribute("aria-selected", isSel ? "true" : "false");
-
-              if (visible) visibleCount++;
-            });
-
-            const hasItems = items.length > 0;
-
-            // Empty message only for truly empty groups, and only when not searching
-            if (empty) {
-              empty.hidden = !( !hasItems && !q );
-            }
-
-            // Hide group while searching if it has no visible results
-            if (q) {
-              group.hidden = (visibleCount === 0) && hasItems;
-              // if group has no items at all: hide during search
-              if (!hasItems) group.hidden = true;
-            } else {
-              // no search: show empty groups (to see categories), show non-empty groups only if they still have visible items
-              if (!hasItems) group.hidden = false;
-              else group.hidden = (visibleCount === 0);
-            }
-          });
-
-          requestAnimationFrame(() => updateScrollUI(list, rail, upBtn, downBtn, thumb, controls));
-        });
-      };
-
-      fields.forEach(field => {
-        const input = field.querySelector(".fieldInput");
-        const search = field.querySelector(".ddSearchInput");
-        const list  = field.querySelector("[data-dd-list]");
-        const items = Array.from(field.querySelectorAll(".ddItem"));
-        const toggleBtn = field.querySelector(".fieldToggle");
-
-        const upBtn = field.querySelector("[data-dd-up]");
-        const downBtn = field.querySelector("[data-dd-down]");
-        const rail = field.querySelector(".ddRail");
-        const thumb = field.querySelector(".ddThumb");
-        const controls = field.querySelector(".ddControls");
-
-        if (!input || !list) return;
-
-        const open = ({ resetSearch = true, focusSearch = true } = {}) => {
-          closeAll(field);
-          field.classList.add("ddOpen");
-          if (search && resetSearch) search.value = "";
-          refreshAllLists();
-          requestAnimationFrame(() => updateScrollUI(list, rail, upBtn, downBtn, thumb, controls));
-          if (focusSearch && search) search.focus({ preventScroll: true });
-        };
-
-        const close = () => {
-          field.classList.remove("ddOpen");
-          if (search) search.value = "";
-          refreshAllLists();
-        };
-
-        const toggleOpen = () => {
-          if (field.classList.contains("ddOpen")) close();
-          else open({ resetSearch: true, focusSearch: true });
-        };
-
-        if (toggleBtn) {
-          toggleBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleOpen();
-          });
-        }
-
-        // Click in field => open dropdown + focus search
-        field.addEventListener("pointerdown", (e) => {
-          if (e.target.closest(".dd")) return;
-          if (e.target.closest(".fieldClear")) return;
-          if (e.target.closest(".fieldToggle")) return;
-
-          e.preventDefault();
-          open({ resetSearch: true, focusSearch: true });
-        });
-
-        // Search inside dropdown only
-        if (search) {
-          search.addEventListener("input", () => {
-            list.scrollTop = 0;
-            refreshAllLists();
-          });
-
-          search.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") {
-              e.preventDefault();
-              close();
-            }
-          });
-        }
-
-        // Pick item
-        items.forEach(btn => {
-          btn.addEventListener("click", () => {
-            const val = (btn.dataset.value || btn.textContent || "").trim();
-            input.value = val;
-
-            // sécurité: si l'autre champ contient déjà ce choix (cas rare), on le purge
-            if (input.id === "pickup" && destination && norm(destination.value) === norm(val)) {
-              destination.value = "";
-              destination.dispatchEvent(new Event("input", { bubbles: true }));
-            }
-            if (input.id === "destination" && pickup && norm(pickup.value) === norm(val)) {
-              pickup.value = "";
-              pickup.dispatchEvent(new Event("input", { bubbles: true }));
-            }
-
-            input.dispatchEvent(new Event("input", { bubbles: true }));
-            close();
-          });
-        });
-
-        // Scroll buttons
-        const step = 160;
-        if (upBtn) upBtn.addEventListener("click", (e) => {
-          e.preventDefault();
-          list.scrollBy({ top: -step, behavior: "smooth" });
-        });
-        if (downBtn) downBtn.addEventListener("click", (e) => {
-          e.preventDefault();
-          list.scrollBy({ top: step, behavior: "smooth" });
-        });
-
-        list.addEventListener("scroll", () => updateScrollUI(list, rail, upBtn, downBtn, thumb, controls));
-        window.addEventListener("resize", () => updateScrollUI(list, rail, upBtn, downBtn, thumb, controls));
-      });
-
-      // Close on outside click
-      document.addEventListener("pointerdown", (e) => {
-        if (!e.target.closest("[data-dropdown-field]")) closeAll();
-      });
-
-      pickup?.addEventListener("input", refreshAllLists);
-      destination?.addEventListener("input", refreshAllLists);
-
-      refreshAllLists();
-    })();
-
-    // --- Validate button + Price display ---
-    (function () {
-      const pickup = document.getElementById("pickup");
-      const destination = document.getElementById("destination");
-
-      const validateBtn = document.getElementById("validateQuote");
-      const priceRow = document.getElementById("priceRow");
-      const priceText = document.getElementById("priceText");
-      const copyPriceBtn = document.getElementById("copyPrice");
-
-      if (!pickup || !destination || !validateBtn || !priceRow || !priceText || !copyPriceBtn) return;
-
-      const normalize = (s) => (s || "").trim().toLowerCase();
-      const isAmarrJita = (a, b) => {
-        const A = normalize(a);
-        const B = normalize(b);
-        const amarr = A.includes("amarr") || B.includes("amarr");
-        const jita  = A.includes("jita")  || B.includes("jita");
-        return amarr && jita;
-      };
-
-      const syncValidate = () => {
-        const ok = pickup.value.trim().length > 0 && destination.value.trim().length > 0;
-        validateBtn.disabled = !ok;
-
-        if (!ok) {
-          priceRow.hidden = true;
-          copyPriceBtn.disabled = true;
-        }
-      };
-
-      pickup.addEventListener("input", syncValidate);
-      destination.addEventListener("input", syncValidate);
-
-      bindCopyButton(copyPriceBtn, () => "65 000 000");
-
-      validateBtn.addEventListener("click", () => {
-        if (validateBtn.disabled) return;
-
-        const p = pickup.value.trim();
-        const d = destination.value.trim();
-
-        if (isAmarrJita(p, d)) {
-          priceText.textContent = "65 000 000 ISK";
-          copyPriceBtn.disabled = false;
-        } else {
-          priceText.textContent = "Pricing unavailable";
-          copyPriceBtn.disabled = true;
-        }
-        priceRow.hidden = false;
-      });
-
-      syncValidate();
-    })();
-  </script>
+  <!-- ✅ FOOTER -->
+  <footer
+    style="
+      max-width: 1080px;
+      margin: 18px auto 26px;
+      padding: 0 18px;
+      text-align: center;
+      color: rgba(242,243,245,.65);
+      font-size: 12px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    "
+  >
+    Made by <span style="color: rgba(242,243,245,.92); font-weight: 600;">Pierre Spencer</span>,
+    Designed by <span style="color: rgba(224,198,139,.92); font-weight: 600;">Charles A</span>
+  </footer>
 </body>
 </html>
