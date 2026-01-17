@@ -53,11 +53,7 @@
               </div>
             </div>
 
-            <div class="kv">
-              <div class="k">Collateral</div>
-              <div class="v">5B ISK (maximum)</div>
-            </div>
-
+            <!-- ✅ NEW ORDER -->
             <div class="kv">
               <div class="k">Time to accept</div>
               <div class="v">3 DAYS</div>
@@ -66,6 +62,11 @@
             <div class="kv">
               <div class="k">Time to complete</div>
               <div class="v">3 DAYS</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Collateral</div>
+              <div class="v">5B ISK (maximum)</div>
             </div>
 
             <div class="kv">
@@ -96,13 +97,16 @@
                 <path d="M12 12.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z" stroke="currentColor" stroke-width="1.6"/>
               </svg>
 
+              <!-- ✅ Readonly: plus de recherche ici -->
               <input
                 class="fieldInput"
                 id="pickup"
                 type="text"
-                placeholder="Type a station name…"
+                value="Jita 4.4 - Caldary Navy Assembly Plant"
+                placeholder="Select pick up…"
                 autocomplete="off"
                 spellcheck="false"
+                readonly
               />
 
               <button class="fieldClear" type="button" aria-label="Clear pick up">
@@ -118,9 +122,7 @@
                 </svg>
               </button>
 
-              <div class="fieldHint">Ex: “KBP7-G - Heir of Athra”</div>
-
-              <!-- Dropdown (overlay, style EVE-like) -->
+              <!-- Dropdown -->
               <div class="dd" data-dd>
                 <div class="ddPanel" role="listbox" aria-label="Pick up station list">
                   <div class="ddSearch">
@@ -135,17 +137,33 @@
 
                   <div class="ddBody">
                     <div class="ddList" data-dd-list>
-                      <!-- 4 premières visibles par défaut (hauteur), puis scroll -->
-                      <button class="ddItem" type="button" data-value="Amarr VIII - Emperor Family Academy">Amarr VIII - Emperor Family Academy</button>
-                      <button class="ddItem" type="button" data-value="Jita 4.4 - Caldary Navy Assembly Plant">Jita 4.4 - Caldary Navy Assembly Plant</button>
-                      <button class="ddItem" type="button" data-value="Dodixie IX - Federation Navy Assembly Plant">Dodixie IX - Federation Navy Assembly Plant</button>
-                      <button class="ddItem" type="button" data-value="Rens VI - Brutor Tribe Treasury">Rens VI - Brutor Tribe Treasury</button>
 
-                      <!-- exemples en plus pour tester scroll -->
-                      <button class="ddItem" type="button" data-value="Hek VIII - Boundless Creation Factory">Hek VIII - Boundless Creation Factory</button>
-                      <button class="ddItem" type="button" data-value="Perimeter - Tranquility Trading Tower">Perimeter - Tranquility Trading Tower</button>
-                      <button class="ddItem" type="button" data-value="Amarr VIII (Oris) - Emperor Family Academy">Amarr VIII (Oris) - Emperor Family Academy</button>
-                      <button class="ddItem" type="button" data-value="Jita IV - Moon 4 (alt)">Jita IV - Moon 4 (alt)</button>
+                      <!-- ✅ Alliance categories -->
+                      <div class="ddGroup" data-group="cva">
+                        <div class="ddGroupTitle">Curatores Veritatis Alliance</div>
+                        <div class="ddEmpty">No locations yet</div>
+                      </div>
+
+                      <div class="ddGroup" data-group="wtfug">
+                        <div class="ddGroupTitle">WTFUG</div>
+                        <div class="ddEmpty">No locations yet</div>
+                      </div>
+
+                      <div class="ddGroup" data-group="npc">
+                        <div class="ddGroupTitle">NPC Space</div>
+
+                        <!-- ✅ contenu inchangé (tes entrées actuelles) -->
+                        <button class="ddItem" type="button" data-value="Amarr VIII - Emperor Family Academy">Amarr VIII - Emperor Family Academy</button>
+                        <button class="ddItem" type="button" data-value="Jita 4.4 - Caldary Navy Assembly Plant">Jita 4.4 - Caldary Navy Assembly Plant</button>
+                        <button class="ddItem" type="button" data-value="Dodixie IX - Federation Navy Assembly Plant">Dodixie IX - Federation Navy Assembly Plant</button>
+                        <button class="ddItem" type="button" data-value="Rens VI - Brutor Tribe Treasury">Rens VI - Brutor Tribe Treasury</button>
+
+                        <button class="ddItem" type="button" data-value="Hek VIII - Boundless Creation Factory">Hek VIII - Boundless Creation Factory</button>
+                        <button class="ddItem" type="button" data-value="Perimeter - Tranquility Trading Tower">Perimeter - Tranquility Trading Tower</button>
+                        <button class="ddItem" type="button" data-value="Amarr VIII (Oris) - Emperor Family Academy">Amarr VIII (Oris) - Emperor Family Academy</button>
+                        <button class="ddItem" type="button" data-value="Jita IV - Moon 4 (alt)">Jita IV - Moon 4 (alt)</button>
+                      </div>
+
                     </div>
 
                     <div class="ddControls">
@@ -191,9 +209,11 @@
                 class="fieldInput"
                 id="destination"
                 type="text"
-                placeholder="Type a destination…"
+                value="Amarr VIII - Emperor Family Academy"
+                placeholder="Select destination…"
                 autocomplete="off"
                 spellcheck="false"
+                readonly
               />
 
               <button class="fieldClear" type="button" aria-label="Clear destination">
@@ -209,9 +229,7 @@
                 </svg>
               </button>
 
-              <div class="fieldHint">Ex: “XHQ-7V - CVA Immortalis”</div>
-
-              <!-- Dropdown (overlay, style EVE-like) -->
+              <!-- Dropdown -->
               <div class="dd" data-dd>
                 <div class="ddPanel" role="listbox" aria-label="Destination list">
                   <div class="ddSearch">
@@ -226,15 +244,31 @@
 
                   <div class="ddBody">
                     <div class="ddList" data-dd-list>
-                      <button class="ddItem" type="button" data-value="Amarr VIII - Emperor Family Academy">Amarr VIII - Emperor Family Academy</button>
-                      <button class="ddItem" type="button" data-value="Jita 4.4 - Caldary Navy Assembly Plant">Jita 4.4 - Caldary Navy Assembly Plant</button>
-                      <button class="ddItem" type="button" data-value="Dodixie IX - Federation Navy Assembly Plant">Dodixie IX - Federation Navy Assembly Plant</button>
-                      <button class="ddItem" type="button" data-value="Rens VI - Brutor Tribe Treasury">Rens VI - Brutor Tribe Treasury</button>
 
-                      <button class="ddItem" type="button" data-value="Hek VIII - Boundless Creation Factory">Hek VIII - Boundless Creation Factory</button>
-                      <button class="ddItem" type="button" data-value="Perimeter - Tranquility Trading Tower">Perimeter - Tranquility Trading Tower</button>
-                      <button class="ddItem" type="button" data-value="Amarr VIII (Oris) - Emperor Family Academy">Amarr VIII (Oris) - Emperor Family Academy</button>
-                      <button class="ddItem" type="button" data-value="Jita IV - Moon 4 (alt)">Jita IV - Moon 4 (alt)</button>
+                      <div class="ddGroup" data-group="cva">
+                        <div class="ddGroupTitle">Curatores Veritatis Alliance</div>
+                        <div class="ddEmpty">No locations yet</div>
+                      </div>
+
+                      <div class="ddGroup" data-group="wtfug">
+                        <div class="ddGroupTitle">WTFUG</div>
+                        <div class="ddEmpty">No locations yet</div>
+                      </div>
+
+                      <div class="ddGroup" data-group="npc">
+                        <div class="ddGroupTitle">NPC Space</div>
+
+                        <button class="ddItem" type="button" data-value="Amarr VIII - Emperor Family Academy">Amarr VIII - Emperor Family Academy</button>
+                        <button class="ddItem" type="button" data-value="Jita 4.4 - Caldary Navy Assembly Plant">Jita 4.4 - Caldary Navy Assembly Plant</button>
+                        <button class="ddItem" type="button" data-value="Dodixie IX - Federation Navy Assembly Plant">Dodixie IX - Federation Navy Assembly Plant</button>
+                        <button class="ddItem" type="button" data-value="Rens VI - Brutor Tribe Treasury">Rens VI - Brutor Tribe Treasury</button>
+
+                        <button class="ddItem" type="button" data-value="Hek VIII - Boundless Creation Factory">Hek VIII - Boundless Creation Factory</button>
+                        <button class="ddItem" type="button" data-value="Perimeter - Tranquility Trading Tower">Perimeter - Tranquility Trading Tower</button>
+                        <button class="ddItem" type="button" data-value="Amarr VIII (Oris) - Emperor Family Academy">Amarr VIII (Oris) - Emperor Family Academy</button>
+                        <button class="ddItem" type="button" data-value="Jita IV - Moon 4 (alt)">Jita IV - Moon 4 (alt)</button>
+                      </div>
+
                     </div>
 
                     <div class="ddControls">
@@ -347,7 +381,6 @@
           input.value = "";
           if (ddSearch) ddSearch.value = "";
           sync();
-          input.focus();
           input.dispatchEvent(new Event("input", { bubbles: true }));
           if (ddSearch) ddSearch.dispatchEvent(new Event("input", { bubbles: true }));
         });
@@ -362,18 +395,18 @@
       bindCopyButton(btn, () => "Pierre Spencer");
     })();
 
-    // --- Dropdowns + mutual exclusion + custom thin scrollbar thumb ---
+    // --- Dropdowns + mutual exclusion + clean scrollbar thumb (no overlap) ---
     (function () {
       const fields = Array.from(document.querySelectorAll("[data-dropdown-field]"));
       const pickup = document.getElementById("pickup");
       const destination = document.getElementById("destination");
 
       const closeAll = (except) => {
-        fields.forEach(f => { if (f !== except) f.classList.remove("ddOpen"); });
+        fields.forEach(f => { if (!except || f !== except) f.classList.remove("ddOpen"); });
       };
 
-      const updateScrollUI = (list, upBtn, downBtn, thumb, controls) => {
-        if (!list || !upBtn || !downBtn || !thumb || !controls) return;
+      const updateScrollUI = (list, rail, upBtn, downBtn, thumb, controls) => {
+        if (!list || !rail || !upBtn || !downBtn || !thumb || !controls) return;
 
         const scrollable = list.scrollHeight > list.clientHeight + 1;
         controls.classList.toggle("isScrollable", scrollable);
@@ -389,10 +422,13 @@
           return;
         }
 
+        // ✅ IMPORTANT: thumb must be computed against rail height (not list height)
+        const railH = rail.clientHeight;
         const maxScroll = Math.max(1, list.scrollHeight - list.clientHeight);
+
         const ratio = list.clientHeight / Math.max(1, list.scrollHeight);
-        const h = Math.max(18, Math.floor(list.clientHeight * ratio));
-        const top = Math.floor((list.scrollTop / maxScroll) * (list.clientHeight - h));
+        const h = Math.max(18, Math.floor(railH * ratio));
+        const top = Math.floor((list.scrollTop / maxScroll) * Math.max(0, railH - h));
 
         thumb.style.height = h + "px";
         thumb.style.transform = "translateY(" + top + "px)";
@@ -405,13 +441,13 @@
         fields.forEach(field => {
           const input = field.querySelector(".fieldInput");
           const search = field.querySelector(".ddSearchInput");
-          const items = Array.from(field.querySelectorAll(".ddItem"));
           const list  = field.querySelector("[data-dd-list]");
           const upBtn = field.querySelector("[data-dd-up]");
           const downBtn = field.querySelector("[data-dd-down]");
+          const rail = field.querySelector(".ddRail");
           const thumb = field.querySelector(".ddThumb");
           const controls = field.querySelector(".ddControls");
-          if (!input) return;
+          if (!input || !list) return;
 
           const q = norm(search?.value);
           const selfSelected = norm(input.value);
@@ -421,23 +457,51 @@
             input.id === "destination" ? selectedPickup :
             "";
 
-          items.forEach(btn => {
-            const v = norm(btn.dataset.value || btn.textContent || "");
-            const matchesQuery = !q || v.includes(q);
+          const groups = Array.from(list.querySelectorAll(".ddGroup"));
 
-            // Bloque l'item pris par l'autre champ, MAIS ne cache pas celui qui est déjà sélectionné dans ce champ
-            const blocked = forbid && v === forbid && v !== selfSelected;
+          groups.forEach(group => {
+            const items = Array.from(group.querySelectorAll(".ddItem"));
+            const empty = group.querySelector(".ddEmpty");
 
-            btn.hidden = !(matchesQuery && !blocked);
+            let visibleCount = 0;
 
-            const isSel = selfSelected && v === selfSelected;
-            btn.classList.toggle("isSelected", isSel);
-            btn.setAttribute("aria-selected", isSel ? "true" : "false");
+            items.forEach(btn => {
+              const v = norm(btn.dataset.value || btn.textContent || "");
+              const matchesQuery = !q || v.includes(q);
+
+              // Bloque l'item pris par l'autre champ, MAIS ne cache pas celui déjà sélectionné dans ce champ
+              const blocked = forbid && v === forbid && v !== selfSelected;
+
+              const visible = matchesQuery && !blocked;
+              btn.hidden = !visible;
+
+              const isSel = selfSelected && v === selfSelected;
+              btn.classList.toggle("isSelected", isSel);
+              btn.setAttribute("aria-selected", isSel ? "true" : "false");
+
+              if (visible) visibleCount++;
+            });
+
+            const hasItems = items.length > 0;
+
+            // Empty message only for truly empty groups, and only when not searching
+            if (empty) {
+              empty.hidden = !( !hasItems && !q );
+            }
+
+            // Hide group while searching if it has no visible results
+            if (q) {
+              group.hidden = (visibleCount === 0) && hasItems;
+              // if group has no items at all: hide during search
+              if (!hasItems) group.hidden = true;
+            } else {
+              // no search: show empty groups (to see categories), show non-empty groups only if they still have visible items
+              if (!hasItems) group.hidden = false;
+              else group.hidden = (visibleCount === 0);
+            }
           });
 
-          if (list) {
-            requestAnimationFrame(() => updateScrollUI(list, upBtn, downBtn, thumb, controls));
-          }
+          requestAnimationFrame(() => updateScrollUI(list, rail, upBtn, downBtn, thumb, controls));
         });
       };
 
@@ -450,16 +514,18 @@
 
         const upBtn = field.querySelector("[data-dd-up]");
         const downBtn = field.querySelector("[data-dd-down]");
+        const rail = field.querySelector(".ddRail");
         const thumb = field.querySelector(".ddThumb");
         const controls = field.querySelector(".ddControls");
 
         if (!input || !list) return;
 
-        const open = ({ resetSearch = false, focusSearch = false } = {}) => {
+        const open = ({ resetSearch = true, focusSearch = true } = {}) => {
           closeAll(field);
           field.classList.add("ddOpen");
           if (search && resetSearch) search.value = "";
           refreshAllLists();
+          requestAnimationFrame(() => updateScrollUI(list, rail, upBtn, downBtn, thumb, controls));
           if (focusSearch && search) search.focus({ preventScroll: true });
         };
 
@@ -474,7 +540,6 @@
           else open({ resetSearch: true, focusSearch: true });
         };
 
-        // Toggle caret button
         if (toggleBtn) {
           toggleBtn.addEventListener("click", (e) => {
             e.preventDefault();
@@ -483,36 +548,28 @@
           });
         }
 
-        // Click anywhere on field opens, but doesn't steal focus from input if clicked directly on it
+        // Click in field => open dropdown + focus search
         field.addEventListener("pointerdown", (e) => {
           if (e.target.closest(".dd")) return;
           if (e.target.closest(".fieldClear")) return;
           if (e.target.closest(".fieldToggle")) return;
 
-          const clickOnInput = (e.target === input);
-          open({ resetSearch: true, focusSearch: !clickOnInput });
-
-          if (!clickOnInput) {
-            e.preventDefault();
-            setTimeout(() => {
-              (search || input).focus({ preventScroll: true });
-            }, 0);
-          }
+          e.preventDefault();
+          open({ resetSearch: true, focusSearch: true });
         });
 
-        input.addEventListener("focus", () => open({ resetSearch: true, focusSearch: false }));
-
-        // typing in main input -> use it as query too (mirrors into search)
-        input.addEventListener("input", () => {
-          if (search) search.value = input.value;
-          open({ resetSearch: false, focusSearch: false });
-          refreshAllLists();
-        });
-
+        // Search inside dropdown only
         if (search) {
           search.addEventListener("input", () => {
-            open({ resetSearch: false, focusSearch: true });
+            list.scrollTop = 0;
             refreshAllLists();
+          });
+
+          search.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+              e.preventDefault();
+              close();
+            }
           });
         }
 
@@ -522,7 +579,7 @@
             const val = (btn.dataset.value || btn.textContent || "").trim();
             input.value = val;
 
-            // sécurité: si l'autre champ contient déjà ce choix (manual typing), on le purge
+            // sécurité: si l'autre champ contient déjà ce choix (cas rare), on le purge
             if (input.id === "pickup" && destination && norm(destination.value) === norm(val)) {
               destination.value = "";
               destination.dispatchEvent(new Event("input", { bubbles: true }));
@@ -548,23 +605,8 @@
           list.scrollBy({ top: step, behavior: "smooth" });
         });
 
-        list.addEventListener("scroll", () => updateScrollUI(list, upBtn, downBtn, thumb, controls));
-        window.addEventListener("resize", () => updateScrollUI(list, upBtn, downBtn, thumb, controls));
-
-        input.addEventListener("keydown", (e) => {
-          if (e.key === "Escape") close();
-          if (e.key === "ArrowDown") open({ resetSearch: false, focusSearch: true });
-        });
-
-        if (search) {
-          search.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") {
-              e.preventDefault();
-              close();
-              input.focus({ preventScroll: true });
-            }
-          });
-        }
+        list.addEventListener("scroll", () => updateScrollUI(list, rail, upBtn, downBtn, thumb, controls));
+        window.addEventListener("resize", () => updateScrollUI(list, rail, upBtn, downBtn, thumb, controls));
       });
 
       // Close on outside click
