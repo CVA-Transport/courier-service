@@ -340,7 +340,6 @@ header{
 .contractTitle{
   display:flex;
   align-items:center;
-  justify-content:space-between;
   gap: 12px;
   margin-bottom: 10px;
 }
@@ -349,17 +348,6 @@ header{
   letter-spacing: .22em;
   text-transform: uppercase;
   color: rgba(243,241,234,.92);
-}
-.contractBadge{
-  font-size: 11px;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  color: rgba(216,192,140,.98);
-  border: 1px solid rgba(183,154,99,.32);
-  background: rgba(183,154,99,.10);
-  padding: 7px 10px;
-  border-radius: 999px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
 }
 
 .kvGrid{
@@ -392,6 +380,10 @@ header{
   display:grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px;
+
+  /* FIX: keep dropdown above the "soon" card */
+  position: relative;
+  z-index: 5;
 }
 
 .box{
@@ -407,6 +399,12 @@ header{
   overflow: visible; /* IMPORTANT for dropdown */
   transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
   min-height: 150px;
+
+  /* FIX: local stacking context */
+  z-index: 1;
+}
+.box:focus-within{
+  z-index: 30; /* the focused one goes above everything */
 }
 
 .box::after{
@@ -478,6 +476,9 @@ header{
   padding: 0 14px;
 
   transition: border-color .18s ease, box-shadow .18s ease, background .18s ease, transform .18s ease;
+
+  /* safety */
+  overflow: visible;
 }
 
 .field:focus-within{
@@ -567,6 +568,8 @@ header{
   justify-content:center;
   text-align:center;
   padding: 14px 12px;
+  position: relative;
+  z-index: 1; /* stays under dropdown now */
 }
 .soonText{
   font-size: 12px;
@@ -579,13 +582,14 @@ header{
   font-weight: 700;
 }
 
-/* === Dropdown (NEW) === */
+/* === Dropdown (FIXED + simplified) === */
 .dd{
   position:absolute;
   left: 0;
   right: 0;
-  top: calc(100% + 10px);
-  z-index: 30;
+  top: calc(100% + 8px);
+  z-index: 200;
+
   opacity: 0;
   transform: translateY(-6px);
   pointer-events: none;
@@ -613,9 +617,9 @@ header{
 }
 
 .ddList{
-  max-height: 210px;
+  max-height: 240px;
   overflow: auto;
-  padding: 8px 46px 8px 8px; /* space for controls on right */
+  padding: 8px; /* simplified (no right space for controls) */
   scrollbar-width: thin;
   scrollbar-color: rgba(216,192,140,.40) rgba(255,255,255,.06);
 }
@@ -645,6 +649,11 @@ header{
   letter-spacing: .01em;
   transition: transform .12s ease, border-color .12s ease, background .12s ease;
   margin: 6px 0;
+
+  /* keep it clean with long station names */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ddItem:hover{
@@ -652,57 +661,14 @@ header{
   border-color: rgba(183,154,99,.35);
   background: rgba(255,255,255,.05);
 }
-
-.ddControls{
-  position:absolute;
-  right: 10px;
-  top: 10px;
-  bottom: 10px;
-  width: 30px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:space-between;
-  gap: 8px;
+.ddItem:active{ transform: translateY(0); }
+.ddItem:focus-visible{
+  outline: 2px solid rgba(216,192,140,.55);
+  outline-offset: 2px;
 }
 
-.ddScroll{
-  width: 30px;
-  height: 30px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.16);
-  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-  color: rgba(216,192,140,.92);
-  cursor: pointer;
-  font-size: 12px;
-  line-height: 1;
-  transition: transform .12s ease, border-color .12s ease, background .12s ease;
-}
-
-.ddScroll:hover{
-  transform: translateY(-1px);
-  border-color: rgba(183,154,99,.35);
-  background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
-}
-
-.ddTrack{
-  flex: 1;
-  width: 10px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.06);
-  position: relative;
-  overflow: hidden;
-}
-
-.ddThumb{
-  width: 100%;
-  height: 22px;
-  border-radius: 999px;
-  background: rgba(216,192,140,.35);
-  border: 1px solid rgba(183,154,99,.22);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
-  transform: translateY(0);
-}
+/* hide the custom scroll controls (keeps premium look + avoids double-scroll UI) */
+.ddControls{ display:none; }
 
 /* Responsive */
 @media (max-width: 900px){
