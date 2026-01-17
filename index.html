@@ -10,7 +10,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-  <!-- CSS (repo root) -->
   <link rel="stylesheet" href="./style.css">
 </head>
 
@@ -98,6 +97,7 @@
 
         <!-- Pick up / Destination -->
         <div class="boxes">
+
           <!-- PICK UP -->
           <div class="box">
             <div class="boxLabel">
@@ -136,6 +136,7 @@
                     <button class="ddItem" type="button" data-value="Jita 4.4 - Caldary Navy Assembly Plant">Jita 4.4 - Caldary Navy Assembly Plant</button>
                   </div>
 
+                  <!-- (kept in HTML but visually hidden via CSS) -->
                   <div class="ddControls" aria-hidden="true">
                     <button class="ddScroll" type="button" data-dd-up title="Scroll up">▲</button>
                     <div class="ddTrack"><div class="ddThumb"></div></div>
@@ -184,6 +185,7 @@
                     <button class="ddItem" type="button" data-value="Jita 4.4 - Caldary Navy Assembly Plant">Jita 4.4 - Caldary Navy Assembly Plant</button>
                   </div>
 
+                  <!-- (kept in HTML but visually hidden via CSS) -->
                   <div class="ddControls" aria-hidden="true">
                     <button class="ddScroll" type="button" data-dd-up title="Scroll up">▲</button>
                     <div class="ddTrack"><div class="ddThumb"></div></div>
@@ -193,6 +195,7 @@
               </div>
             </div>
           </div>
+
         </div>
 
         <!-- Coming soon -->
@@ -211,6 +214,7 @@
       fields.forEach(field => {
         const input = field.querySelector(".fieldInput");
         const clear = field.querySelector(".fieldClear");
+        if (!input || !clear) return;
 
         const sync = () => {
           field.classList.toggle("hasValue", input.value.trim().length > 0);
@@ -219,7 +223,8 @@
         input.addEventListener("input", sync);
         input.addEventListener("change", sync);
 
-        clear.addEventListener("click", () => {
+        clear.addEventListener("click", (e) => {
+          e.stopPropagation();
           input.value = "";
           sync();
           input.focus();
@@ -248,35 +253,19 @@
       });
     })();
 
-    // Dropdowns for Pick up / Destination (simple, elegant, scrollable)
+    // Dropdowns for Pick up / Destination (whole field clickable + flexible)
     (function () {
       const fields = document.querySelectorAll("[data-dropdown-field]");
-
       const closeAll = () => fields.forEach(f => f.classList.remove("ddOpen"));
-
-      const updateThumb = (list, thumb) => {
-        if (!list || !thumb) return;
-        const maxScroll = Math.max(1, list.scrollHeight - list.clientHeight);
-        const ratio = list.clientHeight / Math.max(1, list.scrollHeight);
-        const h = Math.max(22, Math.floor(list.clientHeight * ratio));
-        const top = Math.floor((list.scrollTop / maxScroll) * (list.clientHeight - h));
-        thumb.style.height = h + "px";
-        thumb.style.transform = "translateY(" + top + "px)";
-      };
 
       fields.forEach(field => {
         const input = field.querySelector(".fieldInput");
-        const dd = field.querySelector("[data-dd]");
-        const list = field.querySelector("[data-dd-list]");
         const items = Array.from(field.querySelectorAll(".ddItem"));
-        const up = field.querySelector("[data-dd-up]");
-        const down = field.querySelector("[data-dd-down]");
-        const thumb = field.querySelector(".ddThumb");
+        if (!input) return;
 
         const open = () => {
           closeAll();
           field.classList.add("ddOpen");
-          updateThumb(list, thumb);
         };
 
         const filter = () => {
@@ -285,10 +274,19 @@
             const t = (btn.dataset.value || btn.textContent || "").toLowerCase();
             btn.style.display = !q || t.includes(q) ? "" : "none";
           });
-          updateThumb(list, thumb);
         };
 
-        // Open on click/focus
+        // ✅ Toute la zone .field (icône + fond + hint) focus l'input et ouvre le dropdown
+        field.addEventListener("pointerdown", (e) => {
+          if (e.target === input) return;
+          if (e.target.closest(".dd")) return;          // clique dans le dropdown -> ok
+          if (e.target.closest(".fieldClear")) return;  // clear géré ailleurs
+          e.preventDefault();
+          input.focus({ preventScroll: true });
+          open();
+          filter();
+        });
+
         input.addEventListener("focus", () => { open(); filter(); });
         input.addEventListener("click",  () => { open(); filter(); });
         input.addEventListener("input",  () => { open(); filter(); });
@@ -302,18 +300,14 @@
           });
         });
 
-        // Scroll buttons
-        const step = 90;
-        if (up) up.addEventListener("click", () => { list.scrollBy({ top: -step, behavior: "smooth" }); });
-        if (down) down.addEventListener("click", () => { list.scrollBy({ top: step, behavior: "smooth" }); });
-
-        // Keep thumb synced
-        list.addEventListener("scroll", () => updateThumb(list, thumb));
-        window.addEventListener("resize", () => updateThumb(list, thumb));
+        // Escape to close
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") field.classList.remove("ddOpen");
+        });
       });
 
       // Close when clicking outside
-      document.addEventListener("mousedown", (e) => {
+      document.addEventListener("pointerdown", (e) => {
         const inside = e.target.closest("[data-dropdown-field]");
         if (!inside) closeAll();
       });
