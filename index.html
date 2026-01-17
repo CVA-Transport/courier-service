@@ -14,20 +14,15 @@
 </head>
 
 <body>
-  <div class="grid" aria-hidden="true"></div>
-  <div class="grain" aria-hidden="true"></div>
-
   <main class="wrap">
-    <header>
+    <header class="header">
       <div class="powered" aria-label="Powered by">
         <span>Powered by</span>
         <strong>WTFUG &amp; CVA</strong>
       </div>
 
-      <div class="titleBlock">
-        <h1 class="title"><span class="titleText">Providence courier service</span></h1>
-        <div class="titleLine" aria-hidden="true"></div>
-      </div>
+      <h1 class="title">Providence courier service</h1>
+      <div class="titleLine" aria-hidden="true"></div>
     </header>
 
     <section class="panel" aria-label="Shipping route selectors">
@@ -48,26 +43,14 @@
 
         <!-- Contract details -->
         <div class="card contractCard" aria-label="Contract requirements">
-          <div class="contractTitle">
-            <span>Contract requirements</span>
-            <!-- badge removed -->
-          </div>
+          <div class="sectionTitle">Contract requirements</div>
 
           <div class="kvGrid">
             <div class="kv">
               <div class="k">Contract to</div>
-
-              <div class="v" id="contractTo" style="display:flex; align-items:center; gap:10px;">
-                Pierre Spencer
-                <span
-                  id="copyContractTo"
-                  role="button"
-                  tabindex="0"
-                  title="Copy"
-                  style="cursor:pointer; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color: rgba(216,192,140,.95); user-select:none;"
-                >
-                  Copy
-                </span>
+              <div class="v" id="contractTo">
+                <span>Pierre Spencer</span>
+                <button id="copyContractTo" class="linkBtn" type="button" title="Copy">Copy</button>
               </div>
             </div>
 
@@ -75,14 +58,17 @@
               <div class="k">Collateral</div>
               <div class="v">5B ISK (maximum)</div>
             </div>
+
             <div class="kv">
               <div class="k">Time to accept</div>
               <div class="v">3 DAYS</div>
             </div>
+
             <div class="kv">
               <div class="k">Time to complete</div>
               <div class="v">3 DAYS</div>
             </div>
+
             <div class="kv">
               <div class="k">Max Volume</div>
               <div class="v">60 000 m3</div>
@@ -128,7 +114,6 @@
 
               <div class="fieldHint">Ex: “KBP7-G - Heir of Athra”</div>
 
-              <!-- Dropdown -->
               <div class="dd" data-dd>
                 <div class="ddPanel">
                   <div class="ddList" data-dd-list role="listbox" aria-label="Pick up station list">
@@ -136,7 +121,7 @@
                     <button class="ddItem" type="button" data-value="Jita 4.4 - Caldary Navy Assembly Plant">Jita 4.4 - Caldary Navy Assembly Plant</button>
                   </div>
 
-                  <!-- (kept in HTML but visually hidden via CSS) -->
+                  <!-- gardé mais masqué en CSS -->
                   <div class="ddControls" aria-hidden="true">
                     <button class="ddScroll" type="button" data-dd-up title="Scroll up">▲</button>
                     <div class="ddTrack"><div class="ddThumb"></div></div>
@@ -177,7 +162,6 @@
 
               <div class="fieldHint">Ex: “XHQ-7V - CVA Immortalis”</div>
 
-              <!-- Dropdown -->
               <div class="dd" data-dd>
                 <div class="ddPanel">
                   <div class="ddList" data-dd-list role="listbox" aria-label="Destination list">
@@ -185,7 +169,7 @@
                     <button class="ddItem" type="button" data-value="Jita 4.4 - Caldary Navy Assembly Plant">Jita 4.4 - Caldary Navy Assembly Plant</button>
                   </div>
 
-                  <!-- (kept in HTML but visually hidden via CSS) -->
+                  <!-- gardé mais masqué en CSS -->
                   <div class="ddControls" aria-hidden="true">
                     <button class="ddScroll" type="button" data-dd-up title="Scroll up">▲</button>
                     <div class="ddTrack"><div class="ddThumb"></div></div>
@@ -208,7 +192,7 @@
   </main>
 
   <script>
-    // Tiny UX sugar: show clear button only when input has value
+    // Show clear button only when input has value
     (function () {
       const fields = document.querySelectorAll("[data-field]");
       fields.forEach(field => {
@@ -216,9 +200,7 @@
         const clear = field.querySelector(".fieldClear");
         if (!input || !clear) return;
 
-        const sync = () => {
-          field.classList.toggle("hasValue", input.value.trim().length > 0);
-        };
+        const sync = () => field.classList.toggle("hasValue", input.value.trim().length > 0);
 
         input.addEventListener("input", sync);
         input.addEventListener("change", sync);
@@ -234,7 +216,7 @@
       });
     })();
 
-    // Simple copy for "Contract to"
+    // Copy "Contract to"
     (function () {
       const btn = document.getElementById("copyContractTo");
       if (!btn) return;
@@ -248,15 +230,17 @@
       };
 
       btn.addEventListener("click", copy);
-      btn.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") copy();
-      });
     })();
 
-    // Dropdowns for Pick up / Destination (whole field clickable + flexible)
+    // Dropdowns: simple, whole field clickable, black dropdown, flexible height
     (function () {
-      const fields = document.querySelectorAll("[data-dropdown-field]");
-      const closeAll = () => fields.forEach(f => f.classList.remove("ddOpen"));
+      const fields = Array.from(document.querySelectorAll("[data-dropdown-field]"));
+
+      const closeAll = (except) => {
+        fields.forEach(f => {
+          if (f !== except) f.classList.remove("ddOpen");
+        });
+      };
 
       fields.forEach(field => {
         const input = field.querySelector(".fieldInput");
@@ -264,52 +248,52 @@
         if (!input) return;
 
         const open = () => {
-          closeAll();
+          closeAll(field);
           field.classList.add("ddOpen");
         };
+        const close = () => field.classList.remove("ddOpen");
 
         const filter = () => {
           const q = input.value.trim().toLowerCase();
           items.forEach(btn => {
             const t = (btn.dataset.value || btn.textContent || "").toLowerCase();
-            btn.style.display = !q || t.includes(q) ? "" : "none";
+            btn.style.display = (!q || t.includes(q)) ? "" : "none";
           });
         };
 
-        // ✅ Toute la zone .field (icône + fond + hint) focus l'input et ouvre le dropdown
-        field.addEventListener("pointerdown", (e) => {
-          if (e.target === input) return;
-          if (e.target.closest(".dd")) return;          // clique dans le dropdown -> ok
-          if (e.target.closest(".fieldClear")) return;  // clear géré ailleurs
-          e.preventDefault();
-          input.focus({ preventScroll: true });
+        // ✅ Cliquer n'importe où dans la zone (icône, fond, hint) => focus input + open
+        field.addEventListener("mousedown", (e) => {
+          if (e.target.closest(".dd")) return;
+          if (e.target.closest(".fieldClear")) return;
+
+          if (e.target !== input) {
+            e.preventDefault();
+            input.focus({ preventScroll: true });
+          }
           open();
           filter();
         });
 
         input.addEventListener("focus", () => { open(); filter(); });
-        input.addEventListener("click",  () => { open(); filter(); });
-        input.addEventListener("input",  () => { open(); filter(); });
+        input.addEventListener("input", () => { open(); filter(); });
 
-        // Pick item
         items.forEach(btn => {
           btn.addEventListener("click", () => {
             input.value = btn.dataset.value || btn.textContent.trim();
             input.dispatchEvent(new Event("input", { bubbles: true }));
-            field.classList.remove("ddOpen");
+            close();
           });
         });
 
-        // Escape to close
         input.addEventListener("keydown", (e) => {
-          if (e.key === "Escape") field.classList.remove("ddOpen");
+          if (e.key === "Escape") close();
         });
       });
 
-      // Close when clicking outside
-      document.addEventListener("pointerdown", (e) => {
-        const inside = e.target.closest("[data-dropdown-field]");
-        if (!inside) closeAll();
+      document.addEventListener("mousedown", (e) => {
+        if (!e.target.closest("[data-dropdown-field]")) {
+          fields.forEach(f => f.classList.remove("ddOpen"));
+        }
       });
     })();
   </script>
