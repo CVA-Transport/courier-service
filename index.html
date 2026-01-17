@@ -85,7 +85,16 @@
       position: relative;
       max-width: 1180px;
       margin: 0 auto;
-      padding: 56px 20px 70px;
+      padding: 32px 20px 70px;
+    }
+
+    /* NEW: stage centers the whole block a bit better vertically */
+    .stage{
+      min-height: 100vh;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      padding: 18px 0;
     }
 
     header{
@@ -152,6 +161,15 @@
         0 12px 34px rgba(0,0,0,.55),
         0 0 18px rgba(183,154,99,.10);
     }
+
+    /* NEW: title block makes the underline match title width exactly */
+    .titleBlock{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      width: fit-content;
+    }
+
     .titleText{
       position: relative;
       display: inline-block;
@@ -186,24 +204,32 @@
       }
     }
 
+    /* UPDATED: underline now matches title width (100%) and has a subtle flowing sheen */
     .titleLine{
       margin-top: 12px;
-      width: min(560px, 78vw);
+      width: 100%;
       height: 2px;
       border-radius: 999px;
+
       background: linear-gradient(90deg,
         rgba(183,154,99,0),
         rgba(183,154,99,.78),
-        rgba(255,255,255,.14),
+        rgba(255,255,255,.16),
+        rgba(216,192,140,.65),
         rgba(183,154,99,0)
       );
+      background-size: 220% 100%;
+      background-position: 0% 0%;
+
       filter: drop-shadow(0 0 10px rgba(183,154,99,.16));
-      opacity:.90;
-      animation: underlinePulse 3.4s ease-in-out infinite;
+      opacity:.92;
+
+      animation: underlineFlow 3.8s ease-in-out infinite;
     }
-    @keyframes underlinePulse{
-      0%,100%{ transform: scaleX(.88); opacity:.60; }
-      50%{ transform: scaleX(1); opacity:.98; }
+    @keyframes underlineFlow{
+      0%   { transform: scaleX(.92); opacity:.62; background-position: 0% 0%; }
+      50%  { transform: scaleX(1);   opacity:.98; background-position: 100% 0%; }
+      100% { transform: scaleX(.92); opacity:.62; background-position: 0% 0%; }
     }
 
     /* Main panel area */
@@ -532,7 +558,6 @@
       font-weight: 500;
     }
 
-    /* Optional "hint line" under the input */
     .fieldHint{
       position:absolute;
       left: 46px;
@@ -595,11 +620,14 @@
     }
 
     @media (max-width: 900px){
+      .stage{ justify-content:flex-start; padding: 10px 0; } /* don't over-center on small screens */
       .kvGrid{ grid-template-columns: 1fr; }
       .boxes{ grid-template-columns: 1fr; }
       .statusCard{ flex-direction:column; align-items:flex-start; }
       .statusPill{ width: 100%; justify-content:center; }
       .fieldHint{ display:none; }
+      .titleBlock{ width: 100%; } /* line stays sane if title wraps */
+      .titleLine{ width: min(92vw, 720px); } /* fallback for multi-line title */
     }
   </style>
 </head>
@@ -609,141 +637,146 @@
   <div class="grain" aria-hidden="true"></div>
 
   <main class="wrap">
-    <header>
-      <div class="powered" aria-label="Powered by">
-        <span>Powered by</span>
-        <strong>WTFUG &amp; CVA</strong>
-      </div>
+    <div class="stage">
 
-      <h1 class="title"><span class="titleText">Providence courier service</span></h1>
-      <div class="titleLine" aria-hidden="true"></div>
-    </header>
-
-    <section class="panel" aria-label="Shipping route selectors">
-      <div class="stack">
-
-        <!-- Service status -->
-        <div class="card statusCard" aria-label="Service status">
-          <div class="statusLeft">
-            <div class="statusLabel">Service status</div>
-            <div class="statusMain">Normal Operations — Service Active</div>
-          </div>
-
-          <div class="statusPill" aria-label="Service is active">
-            <span class="dot" aria-hidden="true"></span>
-            <span class="statusText">Active</span>
-          </div>
+      <header>
+        <div class="powered" aria-label="Powered by">
+          <span>Powered by</span>
+          <strong>WTFUG &amp; CVA</strong>
         </div>
 
-        <!-- Contract details -->
-        <div class="card contractCard" aria-label="Contract requirements">
-          <div class="contractTitle">
-            <span>Contract requirements</span>
-            <div class="contractBadge">Standard</div>
-          </div>
-
-          <div class="kvGrid">
-            <div class="kv">
-              <div class="k">Contract to</div>
-              <div class="v">Pierre Spencer</div>
-            </div>
-            <div class="kv">
-              <div class="k">Collateral</div>
-              <div class="v">5B ISK</div>
-            </div>
-            <div class="kv">
-              <div class="k">Time to accept</div>
-              <div class="v">3 DAYS</div>
-            </div>
-            <div class="kv">
-              <div class="k">Time to complete</div>
-              <div class="v">3 DAYS</div>
-            </div>
-            <div class="kv">
-              <div class="k">Max Volume</div>
-              <div class="v">60 000 m3</div>
-            </div>
-            <div class="kv">
-              <div class="k">Notes</div>
-              <div class="v">—</div>
-            </div>
-          </div>
+        <div class="titleBlock">
+          <h1 class="title"><span class="titleText">Providence courier service</span></h1>
+          <div class="titleLine" aria-hidden="true"></div>
         </div>
+      </header>
 
-        <!-- Pick up / Destination -->
-        <div class="boxes">
-          <div class="box">
-            <div class="boxLabel">
-              <span>Pick up station</span>
-              <div class="tag">Origin</div>
+      <section class="panel" aria-label="Shipping route selectors">
+        <div class="stack">
+
+          <!-- Service status -->
+          <div class="card statusCard" aria-label="Service status">
+            <div class="statusLeft">
+              <div class="statusLabel">Service status</div>
+              <div class="statusMain">Normal Operations — Service Active</div>
             </div>
 
-            <div class="field" data-field>
-              <!-- icon -->
-              <svg class="fieldIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11Z" stroke="currentColor" stroke-width="1.6"/>
-                <path d="M12 12.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z" stroke="currentColor" stroke-width="1.6"/>
-              </svg>
+            <div class="statusPill" aria-label="Service is active">
+              <span class="dot" aria-hidden="true"></span>
+              <span class="statusText">Active</span>
+            </div>
+          </div>
 
-              <input
-                class="fieldInput"
-                id="pickup"
-                type="text"
-                placeholder="Type a station name…"
-                autocomplete="off"
-                spellcheck="false"
-              />
+          <!-- Contract details -->
+          <div class="card contractCard" aria-label="Contract requirements">
+            <div class="contractTitle">
+              <span>Contract requirements</span>
+              <div class="contractBadge">Standard</div>
+            </div>
 
-              <button class="fieldClear" type="button" aria-label="Clear pick up">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <div class="kvGrid">
+              <div class="kv">
+                <div class="k">Contract to</div>
+                <div class="v">Pierre Spencer</div>
+              </div>
+              <div class="kv">
+                <div class="k">Collateral</div>
+                <div class="v">5B ISK maximum</div>
+              </div>
+              <div class="kv">
+                <div class="k">Time to accept</div>
+                <div class="v">3 DAYS</div>
+              </div>
+              <div class="kv">
+                <div class="k">Time to complete</div>
+                <div class="v">3 DAYS</div>
+              </div>
+              <div class="kv">
+                <div class="k">Max Volume</div>
+                <div class="v">60 000 m3</div>
+              </div>
+              <!-- UPDATED NOTES -->
+              <div class="kv">
+                <div class="k">Notes</div>
+                <div class="v">janice link (not required)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pick up / Destination -->
+          <div class="boxes">
+            <div class="box">
+              <div class="boxLabel">
+                <span>Pick up station</span>
+                <div class="tag">Origin</div>
+              </div>
+
+              <div class="field" data-field>
+                <svg class="fieldIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11Z" stroke="currentColor" stroke-width="1.6"/>
+                  <path d="M12 12.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z" stroke="currentColor" stroke-width="1.6"/>
                 </svg>
-              </button>
 
-              <div class="fieldHint">Ex: “KBP7-G — CVA Trade Hub”</div>
+                <input
+                  class="fieldInput"
+                  id="pickup"
+                  type="text"
+                  placeholder="Type a station name…"
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+
+                <button class="fieldClear" type="button" aria-label="Clear pick up">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                </button>
+
+                <div class="fieldHint">Ex: “KBP7-G — CVA Trade Hub”</div>
+              </div>
             </div>
-          </div>
 
-          <div class="box">
-            <div class="boxLabel">
-              <span>Destination</span>
-              <div class="tag">Drop</div>
-            </div>
+            <div class="box">
+              <div class="boxLabel">
+                <span>Destination</span>
+                <div class="tag">Drop</div>
+              </div>
 
-            <div class="field" data-field>
-              <!-- icon -->
-              <svg class="fieldIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M20 10.6c0 5.2-8 10.4-8 10.4S4 15.8 4 10.6a8 8 0 1 1 16 0Z" stroke="currentColor" stroke-width="1.6"/>
-                <path d="M12 12.4a2.6 2.6 0 1 0 0-5.2 2.6 2.6 0 0 0 0 5.2Z" stroke="currentColor" stroke-width="1.6"/>
-              </svg>
-
-              <input
-                class="fieldInput"
-                id="destination"
-                type="text"
-                placeholder="Type a destination…"
-                autocomplete="off"
-                spellcheck="false"
-              />
-
-              <button class="fieldClear" type="button" aria-label="Clear destination">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <div class="field" data-field>
+                <svg class="fieldIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M20 10.6c0 5.2-8 10.4-8 10.4S4 15.8 4 10.6a8 8 0 1 1 16 0Z" stroke="currentColor" stroke-width="1.6"/>
+                  <path d="M12 12.4a2.6 2.6 0 1 0 0-5.2 2.6 2.6 0 0 0 0 5.2Z" stroke="currentColor" stroke-width="1.6"/>
                 </svg>
-              </button>
 
-              <div class="fieldHint">Ex: “9UY4-H — Providence”</div>
+                <input
+                  class="fieldInput"
+                  id="destination"
+                  type="text"
+                  placeholder="Type a destination…"
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+
+                <button class="fieldClear" type="button" aria-label="Clear destination">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                </button>
+
+                <div class="fieldHint">Ex: “9UY4-H — Providence”</div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Coming soon -->
-        <div class="card soonCard" aria-label="Coming soon">
-          <div class="soonText"><strong>Jump Freight</strong> services are coming soon</div>
-        </div>
+          <!-- Coming soon -->
+          <div class="card soonCard" aria-label="Coming soon">
+            <div class="soonText"><strong>Jump Freight</strong> services are coming soon</div>
+          </div>
 
-      </div>
-    </section>
+        </div>
+      </section>
+
+    </div>
   </main>
 
   <script>
