@@ -1,18 +1,27 @@
-/* style.css : version "pro, simple, premium" (sans effets/animations/grain/grid) */
+/* style.css — SIMPLE, PRO, GRIS UNI, ZERO BLUR / ZERO GRADIENT / ZERO SHADOW */
+
 :root{
-  --bg: #111317;         /* gris premium */
-  --panel: #0d0f12;      /* noir/gris très sombre */
-  --card: #0f1115;       /* surface */
-  --field: #0a0c10;      /* input */
-  --border: rgba(255,255,255,.14);
+  /* Fond gris premium UNI */
+  --bg: #1b1d21;
 
-  --text: #f3f1ea;
-  --muted: rgba(243,241,234,.68);
+  /* Surfaces (gris) */
+  --panel: #22252b;
+  --card:  #262a31;
+  --field: #1f2228;
+  --dd:    #1c1f25;
 
-  --gold: #b79a63;
-  --gold2:#d8c08c;
+  /* Texte */
+  --text:  #f2f3f5;
+  --muted: rgba(242,243,245,.62);
 
-  --green:#4fd18a;
+  /* Lignes */
+  --border: rgba(255,255,255,.12);
+  --border2: rgba(255,255,255,.18);
+
+  /* Accents */
+  --gold:  #c9aa70;
+  --gold2: #e0c68b;
+  --green: #39d98a;
 
   --r: 16px;
   --r2: 12px;
@@ -31,16 +40,17 @@ body{
 .wrap{
   max-width: 1080px;
   margin: 0 auto;
-  padding: 48px 18px 64px;
+  padding: 44px 18px 64px;
 }
 
+/* Header */
 .header{
   text-align:center;
   display:flex;
   flex-direction:column;
   align-items:center;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 
 .powered{
@@ -75,29 +85,25 @@ body{
   height: 2px;
   border-radius: 999px;
   background: var(--gold);
-  opacity: .7;
+  opacity: .85;
 }
 
+/* Panel */
 .panel{
   border: 1px solid var(--border);
   border-radius: var(--r);
   background: var(--panel);
-  padding: clamp(14px, 2vw, 20px);
-  overflow: visible;
+  padding: clamp(14px, 2vw, 18px);
 }
 
-.stack{
-  display:grid;
-  gap: 14px;
-  overflow: visible;
-}
+/* Layout */
+.stack{ display:grid; gap: 14px; }
 
 .card{
   border: 1px solid var(--border);
   border-radius: var(--r);
   background: var(--card);
   padding: 14px;
-  overflow: visible;
 }
 
 /* Status */
@@ -125,8 +131,7 @@ body{
   gap: 10px;
   padding: 10px 12px;
   border-radius: 999px;
-  border: 1px solid rgba(79,209,138,.35);
-  color: var(--text);
+  border: 1px solid rgba(57,217,138,.35);
   background: transparent;
   white-space: nowrap;
 }
@@ -142,7 +147,7 @@ body{
   text-transform: uppercase;
 }
 
-/* Section title (contract) */
+/* Contract */
 .sectionTitle{
   font-size: 12px;
   letter-spacing: .22em;
@@ -151,18 +156,19 @@ body{
   margin-bottom: 10px;
 }
 
-/* Key/Value */
 .kvGrid{
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 10px;
 }
+
 .kv{
   border: 1px solid var(--border);
   border-radius: var(--r2);
   padding: 12px;
   background: transparent;
 }
+
 .k{
   font-size: 11px;
   letter-spacing: .20em;
@@ -170,6 +176,7 @@ body{
   color: var(--muted);
   margin-bottom: 6px;
 }
+
 .v{
   font-size: 14px;
   font-weight: 600;
@@ -181,21 +188,21 @@ body{
 
 .linkBtn{
   appearance:none;
-  border: 0;
-  padding: 0;
+  border: 1px solid rgba(201,170,112,.35);
   background: transparent;
   color: var(--gold2);
-  font: inherit;
+  padding: 6px 10px;
+  border-radius: 10px;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: .14em;
   text-transform: uppercase;
   cursor: pointer;
 }
+.linkBtn:active{ transform: translateY(1px); }
 .linkBtn:focus-visible{
-  outline: 2px solid rgba(216,192,140,.5);
-  outline-offset: 3px;
-  border-radius: 8px;
+  outline: 2px solid rgba(224,198,139,.45);
+  outline-offset: 2px;
 }
 
 /* Boxes */
@@ -203,7 +210,6 @@ body{
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 14px;
-  overflow: visible;
 }
 
 .box{
@@ -211,8 +217,6 @@ body{
   border-radius: var(--r);
   background: var(--card);
   padding: 14px;
-  overflow: visible;
-  position: relative;
 }
 
 .boxLabel{
@@ -235,15 +239,14 @@ body{
   text-transform: uppercase;
   padding: 6px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(183,154,99,.35);
+  border: 1px solid rgba(201,170,112,.35);
   color: var(--gold2);
   background: transparent;
 }
 
 /* Field */
 .field{
-  position: relative;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border2);
   border-radius: var(--r2);
   background: var(--field);
   padding: 12px;
@@ -253,15 +256,14 @@ body{
   flex-wrap: wrap;
   cursor: text;
 }
-
 .field:focus-within{
-  border-color: rgba(216,192,140,.55);
+  border-color: rgba(224,198,139,.55);
 }
 
 .fieldIcon{
   width: 18px;
   height: 18px;
-  color: rgba(243,241,234,.75);
+  color: rgba(242,243,245,.80);
   flex: 0 0 auto;
 }
 
@@ -277,18 +279,18 @@ body{
   caret-color: var(--gold2);
 }
 .fieldInput::placeholder{
-  color: rgba(243,241,234,.40);
+  color: rgba(242,243,245,.42);
   font-weight: 500;
 }
 
 .fieldHint{
   flex: 0 0 100%;
-  margin-left: 28px; /* icône + gap */
+  margin-left: 28px;
   margin-top: 2px;
   font-size: 10px;
   letter-spacing: .18em;
   text-transform: uppercase;
-  color: rgba(243,241,234,.40);
+  color: rgba(242,243,245,.42);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -297,8 +299,8 @@ body{
 
 .fieldClear{
   display:none;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: transparent;
@@ -309,57 +311,45 @@ body{
 .fieldClear svg{
   width: 16px;
   height: 16px;
-  color: rgba(243,241,234,.75);
+  color: rgba(242,243,245,.80);
 }
 .field.hasValue .fieldClear{ display:flex; }
 .fieldClear:focus-visible{
-  outline: 2px solid rgba(216,192,140,.5);
+  outline: 2px solid rgba(224,198,139,.45);
   outline-offset: 2px;
 }
 
-/* Dropdown: noir complet, simple */
+/* DROPDOWN — EN FLOW (donc impossible qu'il passe derrière le "coming soon") */
 .dd{
-  position:absolute;
-  left: 0;
-  right: 0;
-  top: calc(100% + 8px);
-  z-index: 2000;
-
-  opacity: 0;
-  transform: translateY(-6px);
-  pointer-events: none;
-  transition: opacity .12s ease, transform .12s ease;
+  flex: 0 0 100%;
+  display:none;              /* fermé par défaut */
+  margin-top: 10px;
 }
 
 .field.ddOpen .dd{
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
+  display:block;
 }
 
 .ddPanel{
+  border: 1px solid var(--border);
   border-radius: var(--r2);
-  border: 1px solid rgba(255,255,255,.16);
-  background: #000;
+  background: var(--dd);
   overflow: hidden;
 }
 
 .ddList{
-  max-height: min(52vh, 420px);
+  max-height: 320px;
   overflow: auto;
   padding: 8px;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(216,192,140,.25) rgba(255,255,255,.06);
 }
 
 .ddItem{
   width: 100%;
   text-align: left;
-  border: 1px solid rgba(255,255,255,.12);
-  background: #0a0a0a;
+  border: 1px solid var(--border);
+  background: transparent;
   color: var(--text);
-  border-radius: 12px;
+  border-radius: 10px;
   padding: 12px;
   cursor: pointer;
   font-size: 13px;
@@ -370,23 +360,12 @@ body{
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .ddItem:hover{
-  border-color: rgba(183,154,99,.35);
+  border-color: rgba(201,170,112,.35);
 }
-
-.ddItem:focus-visible{
-  outline: 2px solid rgba(216,192,140,.55);
-  outline-offset: 2px;
-}
-
-/* on enlève tout le bloc de scrollbar custom + controls visuels */
-.ddControls{ display:none; }
 
 /* Coming soon */
-.soonCard{
-  text-align:center;
-}
+.soonCard{ text-align:center; }
 .soonText{
   font-size: 12px;
   letter-spacing: .18em;
@@ -398,7 +377,7 @@ body{
   font-weight: 700;
 }
 
-/* Responsive */
+/* Mobile */
 @media (max-width: 900px){
   .statusCard{
     flex-direction:column;
