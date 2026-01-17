@@ -33,7 +33,6 @@
       /* Premium green status */
       --green:#4fd18a;
       --green2:#2aa86a;
-      --greenBg: rgba(79, 209, 138, .10);
       --greenStroke: rgba(79, 209, 138, .30);
     }
 
@@ -158,7 +157,6 @@
       display: inline-block;
       color: rgba(243,241,234,.96);
     }
-    /* moving "bright" sheen (very subtle, premium) */
     @supports ((-webkit-background-clip:text) or (background-clip:text)) {
       .titleText::after{
         content:"";
@@ -188,7 +186,6 @@
       }
     }
 
-    /* underline bar: centered guaranteed */
     .titleLine{
       margin-top: 12px;
       width: min(560px, 78vw);
@@ -209,7 +206,7 @@
       50%{ transform: scaleX(1); opacity:.98; }
     }
 
-    /* Main panel area (the whole block under the title) */
+    /* Main panel area */
     .panel{
       margin-top: 22px;
       padding: 22px;
@@ -223,12 +220,12 @@
       position: relative;
       overflow:hidden;
 
-      max-width: 1100px; /* centered + slightly wider */
+      max-width: 1100px;
       margin-left: auto;
       margin-right: auto;
     }
 
-    /* darker base + gold touches like the global bg */
+    /* darker base + gold touches */
     .panel::before{
       content:"";
       position:absolute;
@@ -239,6 +236,39 @@
         radial-gradient(900px 300px at 85% 10%, rgba(255,255,255,.08), transparent 60%),
         radial-gradient(800px 260px at 60% 120%, rgba(183,154,99,.12), transparent 58%);
       pointer-events:none;
+    }
+
+    /* Micro gold "corner spark" (premium, subtle) */
+    .panel::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius: inherit;
+      pointer-events:none;
+      opacity:.85;
+      background:
+        /* top-left */
+        linear-gradient(to right, rgba(183,154,99,.40), transparent 70%) 18px 18px / 140px 1px no-repeat,
+        linear-gradient(to bottom, rgba(183,154,99,.34), transparent 70%) 18px 18px / 1px 140px no-repeat,
+
+        /* top-right */
+        linear-gradient(to left, rgba(216,192,140,.34), transparent 70%) calc(100% - 18px) 18px / 140px 1px no-repeat,
+        linear-gradient(to bottom, rgba(216,192,140,.28), transparent 70%) calc(100% - 18px) 18px / 1px 140px no-repeat,
+
+        /* bottom-left */
+        linear-gradient(to right, rgba(216,192,140,.24), transparent 70%) 18px calc(100% - 18px) / 140px 1px no-repeat,
+        linear-gradient(to top, rgba(216,192,140,.22), transparent 70%) 18px calc(100% - 18px) / 1px 140px no-repeat,
+
+        /* bottom-right */
+        linear-gradient(to left, rgba(183,154,99,.28), transparent 70%) calc(100% - 18px) calc(100% - 18px) / 140px 1px no-repeat,
+        linear-gradient(to top, rgba(183,154,99,.24), transparent 70%) calc(100% - 18px) calc(100% - 18px) / 1px 140px no-repeat;
+
+      filter: drop-shadow(0 0 12px rgba(183,154,99,.10));
+      animation: cornerSpark 8.5s ease-in-out infinite;
+    }
+    @keyframes cornerSpark{
+      0%,100%{ opacity:.68; }
+      50%{ opacity:.95; }
     }
 
     .stack{
@@ -320,10 +350,8 @@
       color: rgba(243,241,234,.92);
     }
 
-    /* Contract table card */
-    .contractCard{
-      padding: 16px 16px;
-    }
+    /* Contract card */
+    .contractCard{ padding: 16px 16px; }
     .contractTitle{
       display:flex;
       align-items:center;
@@ -357,8 +385,7 @@
     .kv{
       border-radius: 14px;
       border: 1px solid rgba(255,255,255,.18);
-      background:
-        linear-gradient(180deg, rgba(0,0,0,.26), rgba(0,0,0,.18));
+      background: linear-gradient(180deg, rgba(0,0,0,.26), rgba(0,0,0,.18));
       padding: 12px 12px;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
     }
@@ -394,7 +421,7 @@
       position: relative;
       overflow:hidden;
       transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
-      min-height: 138px;
+      min-height: 150px;
     }
 
     .box::after{
@@ -447,18 +474,106 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
     }
 
-    /* Inner delimited field area (more visible) */
+    /* Premium input field */
     .field{
       position: relative;
       z-index: 1;
-      height: 76px;
+
+      height: 78px;
       border-radius: 14px;
-      border: 1px solid rgba(243,241,234,.22);  /* same family as "Destination" text */
-      background: linear-gradient(180deg, rgba(0,0,0,.34), rgba(0,0,0,.22));
+      border: 1px solid rgba(243,241,234,.22);
+      background: linear-gradient(180deg, rgba(0,0,0,.36), rgba(0,0,0,.22));
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,.08),
         inset 0 0 0 1px rgba(255,255,255,.06);
+
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      padding: 0 14px;
+
+      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease, transform .18s ease;
     }
+
+    .field:focus-within{
+      border-color: rgba(243,241,234,.42);
+      background: linear-gradient(180deg, rgba(0,0,0,.30), rgba(0,0,0,.18));
+      box-shadow:
+        0 0 0 4px rgba(183,154,99,.10),
+        0 18px 40px rgba(0,0,0,.28),
+        inset 0 1px 0 rgba(255,255,255,.10),
+        inset 0 0 0 1px rgba(255,255,255,.08);
+      transform: translateY(-1px);
+    }
+
+    .fieldIcon{
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      color: rgba(243,241,234,.74);
+      opacity: .95;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
+    }
+
+    .fieldInput{
+      width: 100%;
+      border: 0;
+      outline: none;
+      background: transparent;
+      color: rgba(243,241,234,.96);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: .01em;
+      caret-color: var(--gold2);
+    }
+
+    .fieldInput::placeholder{
+      color: rgba(243,241,234,.42);
+      font-weight: 500;
+    }
+
+    /* Optional "hint line" under the input */
+    .fieldHint{
+      position:absolute;
+      left: 46px;
+      right: 46px;
+      bottom: 12px;
+      font-size: 10px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: rgba(243,241,234,.36);
+      pointer-events:none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .fieldClear{
+      display:none;
+      align-items:center;
+      justify-content:center;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      cursor: pointer;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
+    }
+    .fieldClear svg{
+      width: 16px;
+      height: 16px;
+      color: rgba(243,241,234,.70);
+    }
+    .fieldClear:hover{
+      transform: translateY(-1px);
+      border-color: rgba(183,154,99,.35);
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+    }
+    .fieldClear:active{ transform: translateY(0px) scale(.98); }
+
+    .field.hasValue .fieldClear{ display:flex; }
 
     /* Coming soon card */
     .soonCard{
@@ -484,6 +599,7 @@
       .boxes{ grid-template-columns: 1fr; }
       .statusCard{ flex-direction:column; align-items:flex-start; }
       .statusPill{ width: 100%; justify-content:center; }
+      .fieldHint{ display:none; }
     }
   </style>
 </head>
@@ -561,7 +677,31 @@
               <span>Pick up station</span>
               <div class="tag">Origin</div>
             </div>
-            <div class="field" aria-hidden="true"></div>
+
+            <div class="field" data-field>
+              <!-- icon -->
+              <svg class="fieldIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11Z" stroke="currentColor" stroke-width="1.6"/>
+                <path d="M12 12.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z" stroke="currentColor" stroke-width="1.6"/>
+              </svg>
+
+              <input
+                class="fieldInput"
+                id="pickup"
+                type="text"
+                placeholder="Type a station name…"
+                autocomplete="off"
+                spellcheck="false"
+              />
+
+              <button class="fieldClear" type="button" aria-label="Clear pick up">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </button>
+
+              <div class="fieldHint">Ex: “KBP7-G — CVA Trade Hub”</div>
+            </div>
           </div>
 
           <div class="box">
@@ -569,7 +709,31 @@
               <span>Destination</span>
               <div class="tag">Drop</div>
             </div>
-            <div class="field" aria-hidden="true"></div>
+
+            <div class="field" data-field>
+              <!-- icon -->
+              <svg class="fieldIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M20 10.6c0 5.2-8 10.4-8 10.4S4 15.8 4 10.6a8 8 0 1 1 16 0Z" stroke="currentColor" stroke-width="1.6"/>
+                <path d="M12 12.4a2.6 2.6 0 1 0 0-5.2 2.6 2.6 0 0 0 0 5.2Z" stroke="currentColor" stroke-width="1.6"/>
+              </svg>
+
+              <input
+                class="fieldInput"
+                id="destination"
+                type="text"
+                placeholder="Type a destination…"
+                autocomplete="off"
+                spellcheck="false"
+              />
+
+              <button class="fieldClear" type="button" aria-label="Clear destination">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </button>
+
+              <div class="fieldHint">Ex: “9UY4-H — Providence”</div>
+            </div>
           </div>
         </div>
 
@@ -581,5 +745,31 @@
       </div>
     </section>
   </main>
+
+  <script>
+    // Tiny UX sugar: show clear button only when input has value
+    (function () {
+      const fields = document.querySelectorAll("[data-field]");
+      fields.forEach(field => {
+        const input = field.querySelector(".fieldInput");
+        const clear = field.querySelector(".fieldClear");
+
+        const sync = () => {
+          field.classList.toggle("hasValue", input.value.trim().length > 0);
+        };
+
+        input.addEventListener("input", sync);
+        input.addEventListener("change", sync);
+
+        clear.addEventListener("click", () => {
+          input.value = "";
+          sync();
+          input.focus();
+        });
+
+        sync();
+      });
+    })();
+  </script>
 </body>
 </html>
