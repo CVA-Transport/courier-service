@@ -238,11 +238,17 @@
       }
     };
 
+    // Safe binding: avoid stacking multiple handlers if reused
     const bindCopyButton = (btn, getText) => {
       if (!btn) return;
-      const original = btn.textContent;
+      if (btn.__boundCopy) return;
+      btn.__boundCopy = true;
 
       btn.addEventListener("click", async () => {
+        if (btn.disabled) return;
+        const original = btn.__originalText || btn.textContent;
+        btn.__originalText = original;
+
         const text = typeof getText === "function" ? getText() : String(getText || "");
         if (!text) return;
 
@@ -270,7 +276,6 @@
           input.value = "";
           sync();
           input.focus();
-          // trigger validation state update
           input.dispatchEvent(new Event("input", { bubbles: true }));
         });
 
@@ -284,9 +289,13 @@
       bindCopyButton(btn, () => "Pierre Spencer");
     })();
 
-    // --- Dropdowns (one open at a time) + filter + scroll buttons ---
+    // --- Dropdowns + mutual exclusion (one location can be selected once) ---
     (function () {
       const fields = Array.from(document.querySelectorAll("[data-dropdown-field]"));
+      const pickup = document.getElementById("pickup");
+      const destination = document.getElementById("destination");
+
+      const norm = (s) => (s || "").trim().toLowerCase();
 
       const closeAll = (except) => {
         fields.forEach(f => { if (f !== except) f.classList.remove("ddOpen"); });
@@ -300,6 +309,35 @@
         downBtn.disabled = atBottom;
       };
 
+      const refreshAllLists = () => {
+        const selectedPickup = norm(pickup?.value);
+        const selectedDest   = norm(destination?.value);
+
+        fields.forEach(field => {
+          const input = field.querySelector(".fieldInput");
+          const items = Array.from(field.querySelectorAll(".ddItem"));
+          const list  = field.querySelector("[data-dd-list]");
+          const upBtn = field.querySelector("[data-dd-up]");
+          const downBtn = field.querySelector("[data-dd-down]");
+          if (!input) return;
+
+          const q = norm(input.value);
+          const forbid =
+            input.id === "pickup" ? selectedDest :
+            input.id === "destination" ? selectedPickup :
+            "";
+
+          items.forEach(btn => {
+            const v = norm(btn.dataset.value || btn.textContent || "");
+            const matchesQuery = !q || v.includes(q);
+            const blocked = forbid && v === forbid; // déjà pris par l'autre champ
+            btn.style.display = (matchesQuery && !blocked) ? "" : "none";
+          });
+
+          if (list) requestAnimationFrame(() => setScrollBtnState(list, upBtn, downBtn));
+        });
+      };
+
       fields.forEach(field => {
         const input = field.querySelector(".fieldInput");
         const items = Array.from(field.querySelectorAll(".ddItem"));
@@ -311,21 +349,10 @@
         const open = () => {
           closeAll(field);
           field.classList.add("ddOpen");
-          // reset scroll buttons state
+          refreshAllLists();
           setScrollBtnState(list, upBtn, downBtn);
         };
-
         const close = () => field.classList.remove("ddOpen");
-
-        const filter = () => {
-          const q = input.value.trim().toLowerCase();
-          items.forEach(btn => {
-            const t = (btn.dataset.value || btn.textContent || "").toLowerCase();
-            btn.style.display = (!q || t.includes(q)) ? "" : "none";
-          });
-          // after filtering, adjust scroll state
-          requestAnimationFrame(() => setScrollBtnState(list, upBtn, downBtn));
-        };
 
         // Click anywhere in the field => focus + open
         field.addEventListener("pointerdown", (e) => {
@@ -333,7 +360,6 @@
           if (e.target.closest(".fieldClear")) return;
 
           open();
-          filter();
 
           if (e.target !== input) {
             e.preventDefault();
@@ -341,8 +367,8 @@
           }
         });
 
-        input.addEventListener("focus", () => { open(); filter(); });
-        input.addEventListener("input", () => { open(); filter(); });
+        input.addEventListener("focus", () => open());
+        input.addEventListener("input", () => refreshAllLists());
 
         // Pick item
         items.forEach(btn => {
@@ -350,23 +376,20 @@
             input.value = btn.dataset.value || btn.textContent.trim();
             input.dispatchEvent(new Event("input", { bubbles: true }));
             close();
+            refreshAllLists();
           });
         });
 
         // Scroll buttons
-        const step = 160; // ~4 lignes / feeling simple
-        if (upBtn) upBtn.addEventListener("click", () => {
-          list.scrollBy({ top: -step, behavior: "smooth" });
-        });
-        if (downBtn) downBtn.addEventListener("click", () => {
-          list.scrollBy({ top: step, behavior: "smooth" });
-        });
+        const step = 160;
+        if (upBtn) upBtn.addEventListener("click", () => list.scrollBy({ top: -step, behavior: "smooth" }));
+        if (downBtn) downBtn.addEventListener("click", () => list.scrollBy({ top: step, behavior: "smooth" }));
 
         list.addEventListener("scroll", () => setScrollBtnState(list, upBtn, downBtn));
 
         input.addEventListener("keydown", (e) => {
           if (e.key === "Escape") close();
-          if (e.key === "ArrowDown") { open(); filter(); }
+          if (e.key === "ArrowDown") open();
         });
       });
 
@@ -376,6 +399,11 @@
           fields.forEach(f => f.classList.remove("ddOpen"));
         }
       });
+
+      pickup?.addEventListener("input", refreshAllLists);
+      destination?.addEventListener("input", refreshAllLists);
+
+      refreshAllLists();
     })();
 
     // --- Validate button + Price display ---
@@ -403,7 +431,6 @@
         const ok = pickup.value.trim().length > 0 && destination.value.trim().length > 0;
         validateBtn.disabled = !ok;
 
-        // Si on modifie un champ après avoir affiché un prix, on masque (plus clean)
         if (!ok) {
           priceRow.hidden = true;
           copyPriceBtn.disabled = true;
@@ -413,24 +440,21 @@
       pickup.addEventListener("input", syncValidate);
       destination.addEventListener("input", syncValidate);
 
+      bindCopyButton(copyPriceBtn, () => "65 000 000");
+
       validateBtn.addEventListener("click", () => {
         if (validateBtn.disabled) return;
 
         const p = pickup.value.trim();
         const d = destination.value.trim();
 
-        // Prix demandé : Amarr <-> Jita
         if (isAmarrJita(p, d)) {
           priceText.textContent = "65 000 000 ISK";
           copyPriceBtn.disabled = false;
-          // copie UNIQUEMENT le montant
-          bindCopyButton(copyPriceBtn, () => "65 000 000");
         } else {
-          // si pas la route attendue, on reste propre
           priceText.textContent = "Pricing unavailable";
           copyPriceBtn.disabled = true;
         }
-
         priceRow.hidden = false;
       });
 
