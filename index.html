@@ -323,31 +323,413 @@
     </section>
   </main>
 
-<!-- ✅ FOOTER -->
-<footer
-  style="
-    max-width: 1080px;
-    margin: 18px auto 26px;
-    padding: 0 18px;
-    text-align: center;
-    font-size: 12px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: rgba(242,243,245,.60);
-  "
->
-  Engineering by
-  <span style="color: rgba(242,243,245,.92); font-weight: 600;">
-    Pierre Spencer
-  </span>
-  ·
-  Design by
-  <span style="color: rgba(224,198,139,.95); font-weight: 600;">
-    Charles A.
-  </span>
-</footer>
+  <!-- ✅ FOOTER -->
+  <footer
+    style="
+      max-width: 1080px;
+      margin: 18px auto 26px;
+      padding: 0 18px;
+      text-align: center;
+      font-size: 12px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(242,243,245,.60);
+    "
+  >
+    Engineering by
+    <span style="color: rgba(242,243,245,.92); font-weight: 600;">
+      Pierre Spencer
+    </span>
+    ·
+    Design by
+    <span style="color: rgba(224,198,139,.95); font-weight: 600;">
+      Charles A.
+    </span>
+  </footer>
 
+  <script>
+    // -------------------------
+    // Helpers
+    // -------------------------
+    const copyToClipboard = async (text) => {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch {
+        try {
+          document.execCommand("copy");
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+    };
 
+    // Safe binding (avoid stacking handlers)
+    const bindCopyButton = (btn, getText) => {
+      if (!btn) return;
+      if (btn.__boundCopy) return;
+      btn.__boundCopy = true;
 
+      btn.addEventListener("click", async () => {
+        if (btn.disabled) return;
+
+        const original = btn.__originalText || btn.textContent;
+        btn.__originalText = original;
+
+        const text = typeof getText === "function" ? getText() : String(getText || "");
+        if (!text) return;
+
+        const ok = await copyToClipboard(text);
+        btn.textContent = ok ? "Copied" : "Copy";
+        setTimeout(() => (btn.textContent = original), 900);
+      });
+    };
+
+    const norm = (s) => (s || "").trim().toLowerCase();
+
+    // -------------------------
+    // Clear buttons visibility
+    // -------------------------
+    (function () {
+      const fields = document.querySelectorAll("[data-field]");
+      fields.forEach((field) => {
+        const input = field.querySelector(".fieldInput");
+        const clear = field.querySelector(".fieldClear");
+        const ddSearch = field.querySelector(".ddSearchInput");
+        if (!input || !clear) return;
+
+        const sync = () => field.classList.toggle("hasValue", input.value.trim().length > 0);
+
+        // readonly: we still sync once at init
+        sync();
+
+        // clear
+        clear.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          input.value = "";
+          if (ddSearch) ddSearch.value = "";
+
+          sync();
+
+          // notify listeners
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+          if (ddSearch) ddSearch.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+      });
+    })();
+
+    // -------------------------
+    // Copy "Contract to"
+    // -------------------------
+    (function () {
+      const btn = document.getElementById("copyContractTo");
+      bindCopyButton(btn, () => "Pierre Spencer");
+    })();
+
+    // -------------------------
+    // Dropdowns + mutual exclusion + scroll thumb
+    // -------------------------
+    (function () {
+      const fields = Array.from(document.querySelectorAll("[data-dropdown-field]"));
+      const pickup = document.getElementById("pickup");
+      const destination = document.getElementById("destination");
+
+      const closeAll = (except) => {
+        fields.forEach((f) => {
+          if (!except || f !== except) f.classList.remove("ddOpen");
+        });
+      };
+
+      const updateScrollUI = (list, rail, upBtn, downBtn, thumb, controls) => {
+        if (!list || !rail || !upBtn || !downBtn || !thumb || !controls) return;
+
+        const scrollable = list.scrollHeight > list.clientHeight + 1;
+        controls.classList.toggle("isScrollable", scrollable);
+
+        const atTop = list.scrollTop <= 0;
+        const atBottom = list.scrollTop + list.clientHeight >= list.scrollHeight - 1;
+
+        upBtn.disabled = !scrollable || atTop;
+        downBtn.disabled = !scrollable || atBottom;
+
+        if (!scrollable) {
+          thumb.style.height = "0px";
+          thumb.style.transform = "translateY(0px)";
+          return;
+        }
+
+        // Thumb is computed against RAIL height => no overlap with arrow buttons
+        const railH = rail.clientHeight;
+        const maxScroll = Math.max(1, list.scrollHeight - list.clientHeight);
+
+        const ratio = list.clientHeight / Math.max(1, list.scrollHeight);
+        const h = Math.max(18, Math.floor(railH * ratio));
+        const top = Math.floor((list.scrollTop / maxScroll) * Math.max(0, railH - h));
+
+        thumb.style.height = h + "px";
+        thumb.style.transform = "translateY(" + top + "px)";
+      };
+
+      const refreshAllLists = () => {
+        const selectedPickup = norm(pickup?.value);
+        const selectedDest = norm(destination?.value);
+
+        fields.forEach((field) => {
+          const input = field.querySelector(".fieldInput");
+          const search = field.querySelector(".ddSearchInput");
+          const list = field.querySelector("[data-dd-list]");
+          const upBtn = field.querySelector("[data-dd-up]");
+          const downBtn = field.querySelector("[data-dd-down]");
+          const rail = field.querySelector(".ddRail");
+          const thumb = field.querySelector(".ddThumb");
+          const controls = field.querySelector(".ddControls");
+
+          if (!input || !list) return;
+
+          const q = norm(search?.value);
+          const selfSelected = norm(input.value);
+
+          const forbid =
+            input.id === "pickup" ? selectedDest :
+            input.id === "destination" ? selectedPickup :
+            "";
+
+          const groups = Array.from(list.querySelectorAll(".ddGroup"));
+
+          groups.forEach((group) => {
+            const items = Array.from(group.querySelectorAll(".ddItem"));
+            const empty = group.querySelector(".ddEmpty");
+
+            let visibleCount = 0;
+
+            items.forEach((btn) => {
+              const v = norm(btn.dataset.value || btn.textContent || "");
+              const matchesQuery = !q || v.includes(q);
+
+              // hide item used by the other field, except if it's the current selection of this field
+              const blocked = forbid && v === forbid && v !== selfSelected;
+
+              const visible = matchesQuery && !blocked;
+              btn.hidden = !visible;
+
+              const isSel = selfSelected && v === selfSelected;
+              btn.classList.toggle("isSelected", isSel);
+              btn.setAttribute("aria-selected", isSel ? "true" : "false");
+
+              if (visible) visibleCount++;
+            });
+
+            const hasItems = items.length > 0;
+
+            // empty message only for empty groups, only when not searching
+            if (empty) empty.hidden = !( !hasItems && !q );
+
+            // group visibility rules
+            if (q) {
+              // searching: show only groups with results
+              group.hidden = hasItems ? (visibleCount === 0) : true;
+            } else {
+              // not searching: show all empty groups (to see categories), show non-empty groups if they have something visible
+              if (!hasItems) group.hidden = false;
+              else group.hidden = (visibleCount === 0);
+            }
+          });
+
+          requestAnimationFrame(() => updateScrollUI(list, rail, upBtn, downBtn, thumb, controls));
+        });
+      };
+
+      fields.forEach((field) => {
+        const input = field.querySelector(".fieldInput");
+        const search = field.querySelector(".ddSearchInput");
+        const list = field.querySelector("[data-dd-list]");
+        const items = Array.from(field.querySelectorAll(".ddItem"));
+        const toggleBtn = field.querySelector(".fieldToggle");
+
+        const upBtn = field.querySelector("[data-dd-up]");
+        const downBtn = field.querySelector("[data-dd-down]");
+        const rail = field.querySelector(".ddRail");
+        const thumb = field.querySelector(".ddThumb");
+        const controls = field.querySelector(".ddControls");
+
+        if (!input || !list) return;
+
+        const open = () => {
+          closeAll(field);
+          field.classList.add("ddOpen");
+          if (search) search.value = "";
+          list.scrollTop = 0;
+
+          refreshAllLists();
+
+          requestAnimationFrame(() => {
+            updateScrollUI(list, rail, upBtn, downBtn, thumb, controls);
+            if (search) search.focus({ preventScroll: true });
+          });
+        };
+
+        const close = () => {
+          field.classList.remove("ddOpen");
+          if (search) search.value = "";
+          refreshAllLists();
+        };
+
+        const toggleOpen = () => {
+          if (field.classList.contains("ddOpen")) close();
+          else open();
+        };
+
+        // caret button
+        if (toggleBtn) {
+          toggleBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleOpen();
+          });
+        }
+
+        // click on field opens dropdown (search only)
+        field.addEventListener("pointerdown", (e) => {
+          if (e.target.closest(".dd")) return;
+          if (e.target.closest(".fieldClear")) return;
+          if (e.target.closest(".fieldToggle")) return;
+
+          e.preventDefault();
+          open();
+        });
+
+        // search inside dropdown only
+        if (search) {
+          search.addEventListener("input", () => {
+            list.scrollTop = 0;
+            refreshAllLists();
+          });
+
+          search.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+              e.preventDefault();
+              close();
+            }
+          });
+        }
+
+        // pick item
+        items.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const val = (btn.dataset.value || btn.textContent || "").trim();
+            input.value = val;
+
+            // safety (should not happen often because it's hidden in the other list)
+            if (input.id === "pickup" && destination && norm(destination.value) === norm(val)) {
+              destination.value = "";
+              destination.dispatchEvent(new Event("input", { bubbles: true }));
+            }
+            if (input.id === "destination" && pickup && norm(pickup.value) === norm(val)) {
+              pickup.value = "";
+              pickup.dispatchEvent(new Event("input", { bubbles: true }));
+            }
+
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+            close();
+          });
+        });
+
+        // scroll buttons
+        const step = 160;
+        if (upBtn) upBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          list.scrollBy({ top: -step, behavior: "smooth" });
+        });
+        if (downBtn) downBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          list.scrollBy({ top: step, behavior: "smooth" });
+        });
+
+        list.addEventListener("scroll", () => updateScrollUI(list, rail, upBtn, downBtn, thumb, controls));
+        window.addEventListener("resize", () => updateScrollUI(list, rail, upBtn, downBtn, thumb, controls));
+      });
+
+      // close on outside click
+      document.addEventListener("pointerdown", (e) => {
+        if (!e.target.closest("[data-dropdown-field]")) closeAll();
+      });
+
+      pickup?.addEventListener("input", refreshAllLists);
+      destination?.addEventListener("input", refreshAllLists);
+
+      refreshAllLists();
+    })();
+
+    // -------------------------
+    // Validate button + Price display
+    // -------------------------
+    (function () {
+      const pickup = document.getElementById("pickup");
+      const destination = document.getElementById("destination");
+
+      const validateBtn = document.getElementById("validateQuote");
+      const priceRow = document.getElementById("priceRow");
+      const priceText = document.getElementById("priceText");
+      const copyPriceBtn = document.getElementById("copyPrice");
+
+      if (!pickup || !destination || !validateBtn || !priceRow || !priceText || !copyPriceBtn) return;
+
+      const isAmarrJita = (a, b) => {
+        const A = norm(a);
+        const B = norm(b);
+        const amarr = A.includes("amarr") || B.includes("amarr");
+        const jita  = A.includes("jita")  || B.includes("jita");
+        return amarr && jita;
+      };
+
+      bindCopyButton(copyPriceBtn, () => "65 000 000");
+
+      const resetQuote = () => {
+        priceRow.hidden = true;
+        copyPriceBtn.disabled = true;
+        priceText.textContent = "—";
+      };
+
+      const syncValidate = () => {
+        const ok = pickup.value.trim().length > 0 && destination.value.trim().length > 0;
+        validateBtn.disabled = !ok;
+        if (!ok) resetQuote();
+      };
+
+      // when selection changes => hide previous quote (clean UX)
+      pickup.addEventListener("input", () => {
+        resetQuote();
+        syncValidate();
+      });
+      destination.addEventListener("input", () => {
+        resetQuote();
+        syncValidate();
+      });
+
+      validateBtn.addEventListener("click", () => {
+        if (validateBtn.disabled) return;
+
+        const p = pickup.value.trim();
+        const d = destination.value.trim();
+
+        if (isAmarrJita(p, d)) {
+          priceText.textContent = "65 000 000 ISK";
+          copyPriceBtn.disabled = false;
+        } else {
+          priceText.textContent = "Pricing unavailable";
+          copyPriceBtn.disabled = true;
+        }
+
+        priceRow.hidden = false;
+      });
+
+      // init
+      syncValidate();
+      // with defaults, validate becomes enabled; quote stays hidden until click
+    })();
+  </script>
 </body>
 </html>
