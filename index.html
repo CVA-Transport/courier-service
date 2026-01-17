@@ -51,7 +51,7 @@
         <div class="card contractCard" aria-label="Contract requirements">
           <div class="contractTitle">
             <span>Contract requirements</span>
-            <div class="contractBadge">Standard</div>
+            <!-- SUPPRIMÉ: la bulle "Standard" -->
           </div>
 
           <div class="kvGrid">
@@ -128,7 +128,6 @@
 
               <div class="fieldHint">Ex: “KBP7-G - Heir of Athra”</div>
 
-              <!-- Dropdown (same structure as destination) -->
               <div class="dd" data-dd>
                 <div class="ddPanel">
                   <div class="ddList" data-dd-list role="listbox" aria-label="Pick up station list">
@@ -176,7 +175,6 @@
 
               <div class="fieldHint">Ex: “XHQ-7V - CVA Immortalis”</div>
 
-              <!-- Dropdown (same structure as pick up) -->
               <div class="dd" data-dd>
                 <div class="ddPanel">
                   <div class="ddList" data-dd-list role="listbox" aria-label="Destination list">
@@ -205,7 +203,6 @@
   </main>
 
   <script>
-    // Tiny UX sugar: show clear button only when input has value
     (function () {
       const fields = document.querySelectorAll("[data-field]");
       fields.forEach(field => {
@@ -229,7 +226,6 @@
       });
     })();
 
-    // Simple copy for "Contract to"
     (function () {
       const btn = document.getElementById("copyContractTo");
       if (!btn) return;
@@ -248,10 +244,8 @@
       });
     })();
 
-    // Dropdowns for Pick up / Destination (simple, elegant, scrollable)
     (function () {
       const fields = document.querySelectorAll("[data-dropdown-field]");
-
       const closeAll = () => fields.forEach(f => f.classList.remove("ddOpen"));
 
       const updateThumb = (list, thumb) => {
@@ -266,7 +260,6 @@
 
       fields.forEach(field => {
         const input = field.querySelector(".fieldInput");
-        const dd = field.querySelector("[data-dd]");
         const list = field.querySelector("[data-dd-list]");
         const items = Array.from(field.querySelectorAll(".ddItem"));
         const up = field.querySelector("[data-dd-up]");
@@ -288,12 +281,10 @@
           updateThumb(list, thumb);
         };
 
-        // Open on click/focus
         input.addEventListener("focus", () => { open(); filter(); });
         input.addEventListener("click",  () => { open(); filter(); });
         input.addEventListener("input",  () => { open(); filter(); });
 
-        // Pick item
         items.forEach(btn => {
           btn.addEventListener("click", () => {
             input.value = btn.dataset.value || btn.textContent.trim();
@@ -302,17 +293,14 @@
           });
         });
 
-        // Scroll buttons
         const step = 90;
         if (up) up.addEventListener("click", () => { list.scrollBy({ top: -step, behavior: "smooth" }); });
         if (down) down.addEventListener("click", () => { list.scrollBy({ top: step, behavior: "smooth" }); });
 
-        // Keep thumb synced
         list.addEventListener("scroll", () => updateThumb(list, thumb));
         window.addEventListener("resize", () => updateThumb(list, thumb));
       });
 
-      // Close when clicking outside
       document.addEventListener("mousedown", (e) => {
         const inside = e.target.closest("[data-dropdown-field]");
         if (!inside) closeAll();
