@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <!-- Document metadata -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Providence Courier Service</title>
 
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
+  <!-- App styles -->
   <link rel="stylesheet" href="./style.css">
 
-  <!-- ✅ Destination locked style -->
+  <!-- Locked field UI state (visual + interaction cues) -->
   <style>
     .field.isLocked{
       opacity: .55;
@@ -39,7 +42,7 @@
     <section class="panel" aria-label="Shipping route selectors">
       <div class="stack">
 
-        <!-- Service status -->
+        <!-- Service status summary -->
         <div class="card statusCard" aria-label="Service status">
           <div class="statusLeft">
             <div class="statusLabel">Service status</div>
@@ -52,7 +55,7 @@
           </div>
         </div>
 
-        <!-- Contract details -->
+        <!-- Contract details panel -->
         <div class="card contractCard" aria-label="Contract requirements">
           <div class="sectionTitle">Contract requirements</div>
 
@@ -65,7 +68,6 @@
               </div>
             </div>
 
-            <!-- ✅ NEW ORDER -->
             <div class="kv">
               <div class="k">Time to accept</div>
               <div class="v">3 DAYS</div>
@@ -93,7 +95,7 @@
           </div>
         </div>
 
-        <!-- Pick up / Destination -->
+        <!-- Route selectors -->
         <div class="boxes">
 
           <!-- PICK UP -->
@@ -103,6 +105,7 @@
               <div class="tag">Origin</div>
             </div>
 
+            <!-- Dropdown field: pickup -->
             <div class="field" data-field data-dropdown-field>
               <svg class="fieldIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11Z" stroke="currentColor" stroke-width="1.6"/>
@@ -120,21 +123,31 @@
                 readonly
               />
 
+              <!-- Clear current selection -->
               <button class="fieldClear" type="button" aria-label="Clear pick up">
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
                 </svg>
               </button>
 
+              <!-- Open/close dropdown -->
               <button class="fieldToggle" type="button" aria-label="Toggle pick up list">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round"/>
+                  <path
+                    d="M7 10l5 5 5-5"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
                 </svg>
               </button>
 
+              <!-- Dropdown panel -->
               <div class="dd" data-dd>
                 <div class="ddPanel" role="listbox" aria-label="Pick up station list">
+                  <!-- Search -->
                   <div class="ddSearch">
                     <div class="ddSearchWrap">
                       <input class="ddSearchInput" type="text" placeholder="Search…" autocomplete="off" spellcheck="false" />
@@ -145,6 +158,7 @@
                     </div>
                   </div>
 
+                  <!-- List -->
                   <div class="ddBody">
                     <div class="ddList" data-dd-list>
 
@@ -196,12 +210,47 @@
 
                       <div class="ddGroup" data-group="outsmarted">
                         <div class="ddGroupTitle">Outsmarted</div>
-                        <div class="ddEmpty">No locations yet</div>
+
+                        <button class="ddItem" type="button" data-value="3GXF-U - Black Mesa">3GXF-U - Black Mesa</button>
+                        <button class="ddItem" type="button" data-value="VKI-T7 - Home Sweet Home">VKI-T7 - Home Sweet Home</button>
+                        <button class="ddItem" type="button" data-value="VKI-T7 - Azbel">VKI-T7 - Azbel</button>
+                        <button class="ddItem" type="button" data-value="VKI-T7 - Sektor 47">VKI-T7 - Sektor 47</button>
+                        <button class="ddItem" type="button" data-value="H-GKI6 - Care Hub">H-GKI6 - Care Hub</button>
+                        <button class="ddItem" type="button" data-value="H-GKI6 - Fuel Factory">H-GKI6 - Fuel Factory</button>
+                        <button class="ddItem" type="button" data-value="H-GKI6 - Ice Refinery">H-GKI6 - Ice Refinery</button>
+                        <button class="ddItem" type="button" data-value="8P9-BM - In honor of Edita Aldent">8P9-BM - In honor of Edita Aldent</button>
+                        <button class="ddItem" type="button" data-value="8P9-BM - OA2">8P9-BM - OA2</button>
+                        <button class="ddItem" type="button" data-value="YQB-22 - Fortizar">YQB-22 - Fortizar</button>
+                        <button class="ddItem" type="button" data-value="F-YH5B - OA1">F-YH5B - OA1</button>
                       </div>
 
                       <div class="ddGroup" data-group="red">
                         <div class="ddGroupTitle">RED Alliance</div>
-                        <div class="ddEmpty">No locations yet</div>
+
+                        <button class="ddItem" type="button" data-value="H6-CX8 - Footizar C-">H6-CX8 - Footizar C-</button>
+                        <button class="ddItem" type="button" data-value="Shintaht - Athanor C+">Shintaht - Athanor C+</button>
+                        <button class="ddItem" type="button" data-value="Shintaht - Minas Itil">Shintaht - Minas Itil</button>
+                        <button class="ddItem" type="button" data-value="Shintaht - Raitaru C+">Shintaht - Raitaru C+</button>
+
+                        <button class="ddItem" type="button" data-value="D-6WS1 - Central Ferox Factory B">D-6WS1 - Central Ferox Factory B</button>
+                        <button class="ddItem" type="button" data-value="D-6WS1 - Fires Of Doom C+">D-6WS1 - Fires Of Doom C+</button>
+                        <button class="ddItem" type="button" data-value="D-6WS1 - Moros Navy Evil Lair B">D-6WS1 - Moros Navy Evil Lair B</button>
+
+                        <button class="ddItem" type="button" data-value="SI-I89 - Building Thingy C+">SI-I89 - Building Thingy C+</button>
+                        <button class="ddItem" type="button" data-value="SI-I89 - Central Repro Center B-">SI-I89 - Central Repro Center B-</button>
+                        <button class="ddItem" type="button" data-value="SI-I89 - I am very sleepy">SI-I89 - I am very sleepy</button>
+
+                        <button class="ddItem" type="button" data-value="UL-7I8 - Red Fox">UL-7I8 - Red Fox</button>
+                        <button class="ddItem" type="button" data-value="ERVK-P - RED Star">ERVK-P - RED Star</button>
+
+                        <button class="ddItem" type="button" data-value="BR-N97 - Lear's Advanced Lair">BR-N97 - Lear's Advanced Lair</button>
+                        <button class="ddItem" type="button" data-value="BR-N97 - Lear's Big Lair">BR-N97 - Lear's Big Lair</button>
+                        <button class="ddItem" type="button" data-value="BR-N97 - Lear's Heaven">BR-N97 - Lear's Heaven</button>
+
+                        <button class="ddItem" type="button" data-value="IS-R7P - Tatoshila's Palace">IS-R7P - Tatoshila's Palace</button>
+                        <button class="ddItem" type="button" data-value="I-MGAB - Yggdrasill">I-MGAB - Yggdrasill</button>
+                        <button class="ddItem" type="button" data-value="18XA-C - Homeland of crabs">18XA-C - Homeland of crabs</button>
+                        <button class="ddItem" type="button" data-value="Z-RFE3 - Mother Teresa">Z-RFE3 - Mother Teresa</button>
                       </div>
 
                       <div class="ddGroup" data-group="linknet">
@@ -226,11 +275,18 @@
 
                     </div>
 
+                    <!-- Custom scroll controls -->
                     <div class="ddControls">
                       <button class="ddScroll" type="button" data-dd-up aria-label="Scroll up">
                         <svg viewBox="0 0 24 24" aria-hidden="true">
-                          <path d="M7 14l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round"/>
+                          <path
+                            d="M7 14l5-5 5 5"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
                         </svg>
                       </button>
 
@@ -240,8 +296,14 @@
 
                       <button class="ddScroll" type="button" data-dd-down aria-label="Scroll down">
                         <svg viewBox="0 0 24 24" aria-hidden="true">
-                          <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round"/>
+                          <path
+                            d="M7 10l5 5 5-5"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -259,6 +321,7 @@
               <div class="tag">Drop</div>
             </div>
 
+            <!-- Dropdown field: destination -->
             <div class="field" data-field data-dropdown-field>
               <svg class="fieldIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M20 10.6c0 5.2-8 10.4-8 10.4S4 15.8 4 10.6a8 8 0 1 1 16 0Z" stroke="currentColor" stroke-width="1.6"/>
@@ -276,21 +339,31 @@
                 readonly
               />
 
+              <!-- Clear current selection -->
               <button class="fieldClear" type="button" aria-label="Clear destination">
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
                 </svg>
               </button>
 
+              <!-- Open/close dropdown -->
               <button class="fieldToggle" type="button" aria-label="Toggle destination list">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round"/>
+                  <path
+                    d="M7 10l5 5 5-5"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
                 </svg>
               </button>
 
+              <!-- Dropdown panel -->
               <div class="dd" data-dd>
                 <div class="ddPanel" role="listbox" aria-label="Destination list">
+                  <!-- Search -->
                   <div class="ddSearch">
                     <div class="ddSearchWrap">
                       <input class="ddSearchInput" type="text" placeholder="Search…" autocomplete="off" spellcheck="false" />
@@ -301,6 +374,7 @@
                     </div>
                   </div>
 
+                  <!-- List -->
                   <div class="ddBody">
                     <div class="ddList" data-dd-list>
 
@@ -352,12 +426,47 @@
 
                       <div class="ddGroup" data-group="outsmarted">
                         <div class="ddGroupTitle">Outsmarted</div>
-                        <div class="ddEmpty">No locations yet</div>
+
+                        <button class="ddItem" type="button" data-value="3GXF-U - Black Mesa">3GXF-U - Black Mesa</button>
+                        <button class="ddItem" type="button" data-value="VKI-T7 - Home Sweet Home">VKI-T7 - Home Sweet Home</button>
+                        <button class="ddItem" type="button" data-value="VKI-T7 - Azbel">VKI-T7 - Azbel</button>
+                        <button class="ddItem" type="button" data-value="VKI-T7 - Sektor 47">VKI-T7 - Sektor 47</button>
+                        <button class="ddItem" type="button" data-value="H-GKI6 - Care Hub">H-GKI6 - Care Hub</button>
+                        <button class="ddItem" type="button" data-value="H-GKI6 - Fuel Factory">H-GKI6 - Fuel Factory</button>
+                        <button class="ddItem" type="button" data-value="H-GKI6 - Ice Refinery">H-GKI6 - Ice Refinery</button>
+                        <button class="ddItem" type="button" data-value="8P9-BM - In honor of Edita Aldent">8P9-BM - In honor of Edita Aldent</button>
+                        <button class="ddItem" type="button" data-value="8P9-BM - OA2">8P9-BM - OA2</button>
+                        <button class="ddItem" type="button" data-value="YQB-22 - Fortizar">YQB-22 - Fortizar</button>
+                        <button class="ddItem" type="button" data-value="F-YH5B - OA1">F-YH5B - OA1</button>
                       </div>
 
                       <div class="ddGroup" data-group="red">
                         <div class="ddGroupTitle">RED Alliance</div>
-                        <div class="ddEmpty">No locations yet</div>
+
+                        <button class="ddItem" type="button" data-value="H6-CX8 - Footizar C-">H6-CX8 - Footizar C-</button>
+                        <button class="ddItem" type="button" data-value="Shintaht - Athanor C+">Shintaht - Athanor C+</button>
+                        <button class="ddItem" type="button" data-value="Shintaht - Minas Itil">Shintaht - Minas Itil</button>
+                        <button class="ddItem" type="button" data-value="Shintaht - Raitaru C+">Shintaht - Raitaru C+</button>
+
+                        <button class="ddItem" type="button" data-value="D-6WS1 - Central Ferox Factory B">D-6WS1 - Central Ferox Factory B</button>
+                        <button class="ddItem" type="button" data-value="D-6WS1 - Fires Of Doom C+">D-6WS1 - Fires Of Doom C+</button>
+                        <button class="ddItem" type="button" data-value="D-6WS1 - Moros Navy Evil Lair B">D-6WS1 - Moros Navy Evil Lair B</button>
+
+                        <button class="ddItem" type="button" data-value="SI-I89 - Building Thingy C+">SI-I89 - Building Thingy C+</button>
+                        <button class="ddItem" type="button" data-value="SI-I89 - Central Repro Center B-">SI-I89 - Central Repro Center B-</button>
+                        <button class="ddItem" type="button" data-value="SI-I89 - I am very sleepy">SI-I89 - I am very sleepy</button>
+
+                        <button class="ddItem" type="button" data-value="UL-7I8 - Red Fox">UL-7I8 - Red Fox</button>
+                        <button class="ddItem" type="button" data-value="ERVK-P - RED Star">ERVK-P - RED Star</button>
+
+                        <button class="ddItem" type="button" data-value="BR-N97 - Lear's Advanced Lair">BR-N97 - Lear's Advanced Lair</button>
+                        <button class="ddItem" type="button" data-value="BR-N97 - Lear's Big Lair">BR-N97 - Lear's Big Lair</button>
+                        <button class="ddItem" type="button" data-value="BR-N97 - Lear's Heaven">BR-N97 - Lear's Heaven</button>
+
+                        <button class="ddItem" type="button" data-value="IS-R7P - Tatoshila's Palace">IS-R7P - Tatoshila's Palace</button>
+                        <button class="ddItem" type="button" data-value="I-MGAB - Yggdrasill">I-MGAB - Yggdrasill</button>
+                        <button class="ddItem" type="button" data-value="18XA-C - Homeland of crabs">18XA-C - Homeland of crabs</button>
+                        <button class="ddItem" type="button" data-value="Z-RFE3 - Mother Teresa">Z-RFE3 - Mother Teresa</button>
                       </div>
 
                       <div class="ddGroup" data-group="linknet">
@@ -382,11 +491,18 @@
 
                     </div>
 
+                    <!-- Custom scroll controls -->
                     <div class="ddControls">
                       <button class="ddScroll" type="button" data-dd-up aria-label="Scroll up">
                         <svg viewBox="0 0 24 24" aria-hidden="true">
-                          <path d="M7 14l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round"/>
+                          <path
+                            d="M7 14l5-5 5 5"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
                         </svg>
                       </button>
 
@@ -396,8 +512,14 @@
 
                       <button class="ddScroll" type="button" data-dd-down aria-label="Scroll down">
                         <svg viewBox="0 0 24 24" aria-hidden="true">
-                          <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round"/>
+                          <path
+                            d="M7 10l5 5 5-5"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -410,7 +532,7 @@
 
         </div>
 
-        <!-- Quote / Validate -->
+        <!-- Quote / Validation -->
         <div class="card quoteCard" aria-label="Quote validation">
           <div class="quoteTop">
             <div>
@@ -432,7 +554,7 @@
           </div>
         </div>
 
-        <!-- Coming soon -->
+        <!-- Placeholder / roadmap callout -->
         <div class="card soonCard" aria-label="Coming soon">
           <div class="soonText"><strong>Jump Freight</strong> services are coming soon</div>
         </div>
@@ -441,7 +563,7 @@
     </section>
   </main>
 
-  <!-- ✅ FOOTER -->
+  <!-- Footer credits -->
   <footer
     style="
       max-width: 1080px;
@@ -467,8 +589,10 @@
 
   <script>
     // -------------------------
-    // Helpers
+    // Utilities
     // -------------------------
+
+    // Copy helper with modern API + legacy fallback
     const copyToClipboard = async (text) => {
       try {
         await navigator.clipboard.writeText(text);
@@ -483,7 +607,7 @@
       }
     };
 
-    // Safe binding (avoid stacking handlers)
+    // One-time event binding to prevent duplicated handlers
     const bindCopyButton = (btn, getText) => {
       if (!btn) return;
       if (btn.__boundCopy) return;
@@ -504,11 +628,14 @@
       });
     };
 
+    // Normalize strings for comparisons
     const norm = (s) => (s || "").trim().toLowerCase();
 
     // -------------------------
-    // Location grouping helpers (NPC vs Non-NPC)
+    // Location grouping (NPC vs non-NPC)
     // -------------------------
+
+    // Build a lookup map: location label -> group key
     const buildLocationGroupMap = () => {
       const m = new Map();
       document.querySelectorAll(".ddItem").forEach((btn) => {
@@ -521,6 +648,7 @@
 
     let LOCATION_GROUP_MAP = null;
 
+    // Resolve group for a given location value
     const getLocationGroup = (value) => {
       const v = norm(value || "");
       if (!v) return "";
@@ -528,7 +656,7 @@
       return LOCATION_GROUP_MAP.get(v) || "";
     };
 
-    // ✅ Règle: interdit seulement Non-NPC <-> Non-NPC
+    // Rule: only forbid non-NPC <-> non-NPC routes
     const isRouteValid = (pickupValue, destinationValue) => {
       const pg = getLocationGroup(pickupValue);
       const dg = getLocationGroup(destinationValue);
@@ -537,7 +665,7 @@
     };
 
     // -------------------------
-    // Clear buttons visibility
+    // Clear button state (show/hide)
     // -------------------------
     (function () {
       const fields = document.querySelectorAll("[data-field]");
@@ -568,7 +696,7 @@
     })();
 
     // -------------------------
-    // Copy "Contract to"
+    // Copy: "Contract to"
     // -------------------------
     (function () {
       const btn = document.getElementById("copyContractTo");
@@ -577,16 +705,18 @@
 
     // -------------------------
     // Dropdowns + mutual exclusion + route restriction + scroll thumb
-    // + ✅ Destination locked until pickup is chosen
+    // Destination is locked until pickup is selected
     // -------------------------
     (function () {
       const fields = Array.from(document.querySelectorAll("[data-dropdown-field]"));
       const pickup = document.getElementById("pickup");
       const destination = document.getElementById("destination");
 
-      const getFieldByInputId = (id) => fields.find(f => f.querySelector(".fieldInput")?.id === id) || null;
+      // Helper: find the .field wrapper by input id
+      const getFieldByInputId = (id) => fields.find((f) => f.querySelector(".fieldInput")?.id === id) || null;
       const destinationField = getFieldByInputId("destination");
 
+      // Enable/disable destination UI (visual + interactive)
       const setDestinationLocked = (locked) => {
         if (!destinationField || !destination) return;
 
@@ -603,23 +733,26 @@
         if (locked) destinationField.classList.remove("ddOpen");
       };
 
+      // Sync lock state based on pickup selection
       const syncDestinationLock = () => {
         const hasPickup = !!pickup?.value.trim();
         setDestinationLocked(!hasPickup);
 
-        // si pickup est vide => on vide destination (évite une valeur "bloquée")
+        // If pickup is cleared, clear destination to avoid stale/locked value
         if (!hasPickup && destination && destination.value.trim()) {
           destination.value = "";
           destination.dispatchEvent(new Event("input", { bubbles: true }));
         }
       };
 
+      // Close all dropdowns (optionally keep one open)
       const closeAll = (except) => {
         fields.forEach((f) => {
           if (!except || f !== except) f.classList.remove("ddOpen");
         });
       };
 
+      // Update custom scrollbar UI (thumb size/position + arrows)
       const updateScrollUI = (list, rail, upBtn, downBtn, thumb, controls) => {
         if (!list || !rail || !upBtn || !downBtn || !thumb || !controls) return;
 
@@ -649,6 +782,7 @@
         thumb.style.transform = "translateY(" + top + "px)";
       };
 
+      // Enforce route rule by clearing the "other" field when invalid
       let enforcing = false;
       const enforceRouteRule = (changedId) => {
         if (enforcing) return;
@@ -674,6 +808,7 @@
         }
       };
 
+      // Filter/refresh dropdown lists based on search, selection, and route restrictions
       const refreshAllLists = () => {
         const selectedPickup = norm(pickup?.value);
         const selectedDest = norm(destination?.value);
@@ -696,6 +831,7 @@
           const q = norm(search?.value);
           const selfSelected = norm(input.value);
 
+          // Prevent selecting the same value in both fields
           const forbid =
             input.id === "pickup" ? selectedDest :
             input.id === "destination" ? selectedPickup :
@@ -706,6 +842,7 @@
             input.id === "destination" ? pickupGroup :
             "";
 
+          // If the other selection is non-NPC, restrict to NPC only
           const restrictTo =
             otherGroup && otherGroup !== "npc"
               ? "npc"
@@ -748,7 +885,7 @@
 
             const hasItems = items.length > 0;
 
-            if (empty) empty.hidden = !( !hasItems && !q );
+            if (empty) empty.hidden = !(!hasItems && !q);
 
             if (q) {
               group.hidden = hasItems ? (visibleCount === 0) : true;
@@ -762,6 +899,7 @@
         });
       };
 
+      // Wire dropdown interactions for each field
       fields.forEach((field) => {
         const input = field.querySelector(".fieldInput");
         const search = field.querySelector(".ddSearchInput");
@@ -778,7 +916,7 @@
         if (!input || !list) return;
 
         const open = () => {
-          if (input.disabled) return; // ✅ bloque ouverture si field lock
+          if (input.disabled) return; // Block open when field is locked
           closeAll(field);
           field.classList.add("ddOpen");
           if (search) search.value = "";
@@ -799,14 +937,14 @@
         };
 
         const toggleOpen = () => {
-          if (input.disabled) return; // ✅ bloque toggle si field lock
+          if (input.disabled) return; // Block toggle when field is locked
           if (field.classList.contains("ddOpen")) close();
           else open();
         };
 
         if (toggleBtn) {
           toggleBtn.addEventListener("click", (e) => {
-            if (input.disabled) return; // ✅
+            if (input.disabled) return;
             e.preventDefault();
             e.stopPropagation();
             toggleOpen();
@@ -814,7 +952,7 @@
         }
 
         field.addEventListener("pointerdown", (e) => {
-          if (input.disabled) return; // ✅ bloque clic si field lock
+          if (input.disabled) return; // Block click when field is locked
           if (e.target.closest(".dd")) return;
           if (e.target.closest(".fieldClear")) return;
           if (e.target.closest(".fieldToggle")) return;
@@ -842,6 +980,7 @@
             const val = (btn.dataset.value || btn.textContent || "").trim();
             input.value = val;
 
+            // Enforce mutual exclusion (no identical pickup/destination)
             if (input.id === "pickup" && destination && norm(destination.value) === norm(val)) {
               destination.value = "";
               destination.dispatchEvent(new Event("input", { bubbles: true }));
@@ -858,6 +997,7 @@
           });
         });
 
+        // Scroll controls
         const step = 160;
         if (upBtn) upBtn.addEventListener("click", (e) => {
           e.preventDefault();
@@ -872,23 +1012,25 @@
         window.addEventListener("resize", () => updateScrollUI(list, rail, upBtn, downBtn, thumb, controls));
       });
 
+      // Close dropdown when clicking outside
       document.addEventListener("pointerdown", (e) => {
         if (!e.target.closest("[data-dropdown-field]")) closeAll();
       });
 
+      // React to value changes
       pickup?.addEventListener("input", () => {
         syncDestinationLock();
         refreshAllLists();
       });
       destination?.addEventListener("input", refreshAllLists);
 
-      // init
+      // Init state
       syncDestinationLock();
       refreshAllLists();
     })();
 
     // -------------------------
-    // Validate button + Price display
+    // Quote validation + pricing display
     // -------------------------
     (function () {
       const pickup = document.getElementById("pickup");
@@ -901,6 +1043,7 @@
 
       if (!pickup || !destination || !validateBtn || !priceRow || !priceText || !copyPriceBtn) return;
 
+      // Detect Amarr <-> Jita routes (case-insensitive)
       const isAmarrJita = (a, b) => {
         const A = norm(a);
         const B = norm(b);
@@ -909,14 +1052,17 @@
         return amarr && jita;
       };
 
+      // Copy price shortcut (when available)
       bindCopyButton(copyPriceBtn, () => "65 000 000");
 
+      // Reset quote UI
       const resetQuote = () => {
         priceRow.hidden = true;
         copyPriceBtn.disabled = true;
         priceText.textContent = "—";
       };
 
+      // Enable/disable Validate based on selections + route rule
       const syncValidate = () => {
         const okBasic = pickup.value.trim().length > 0 && destination.value.trim().length > 0;
         const okRoute = okBasic && isRouteValid(pickup.value, destination.value);
@@ -934,6 +1080,7 @@
         syncValidate();
       });
 
+      // Compute and show the price on demand
       validateBtn.addEventListener("click", () => {
         if (validateBtn.disabled) return;
 
