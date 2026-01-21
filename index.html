@@ -10,6 +10,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="./style.css">
+
+  <!-- ✅ Destination locked style -->
+  <style>
+    .field.isLocked{
+      opacity: .55;
+      cursor: not-allowed;
+    }
+    .field.isLocked .fieldToggle,
+    .field.isLocked .fieldClear{
+      opacity: .6;
+    }
+  </style>
 </head>
 
 <body>
@@ -516,8 +528,7 @@
       return LOCATION_GROUP_MAP.get(v) || "";
     };
 
-    // ✅ Nouvelle règle: interdit SEULEMENT Non-NPC <-> Non-NPC
-    // Donc: route valide si au moins un côté est NPC.
+    // ✅ Règle: interdit seulement Non-NPC <-> Non-NPC
     const isRouteValid = (pickupValue, destinationValue) => {
       const pg = getLocationGroup(pickupValue);
       const dg = getLocationGroup(destinationValue);
@@ -566,11 +577,42 @@
 
     // -------------------------
     // Dropdowns + mutual exclusion + route restriction + scroll thumb
+    // + ✅ Destination locked until pickup is chosen
     // -------------------------
     (function () {
       const fields = Array.from(document.querySelectorAll("[data-dropdown-field]"));
       const pickup = document.getElementById("pickup");
       const destination = document.getElementById("destination");
+
+      const getFieldByInputId = (id) => fields.find(f => f.querySelector(".fieldInput")?.id === id) || null;
+      const destinationField = getFieldByInputId("destination");
+
+      const setDestinationLocked = (locked) => {
+        if (!destinationField || !destination) return;
+
+        destinationField.classList.toggle("isLocked", locked);
+        destinationField.setAttribute("aria-disabled", locked ? "true" : "false");
+
+        const toggle = destinationField.querySelector(".fieldToggle");
+        const clear = destinationField.querySelector(".fieldClear");
+
+        destination.disabled = locked;
+        if (toggle) toggle.disabled = locked;
+        if (clear) clear.disabled = locked;
+
+        if (locked) destinationField.classList.remove("ddOpen");
+      };
+
+      const syncDestinationLock = () => {
+        const hasPickup = !!pickup?.value.trim();
+        setDestinationLocked(!hasPickup);
+
+        // si pickup est vide => on vide destination (évite une valeur "bloquée")
+        if (!hasPickup && destination && destination.value.trim()) {
+          destination.value = "";
+          destination.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+      };
 
       const closeAll = (except) => {
         fields.forEach((f) => {
@@ -620,8 +662,6 @@
 
         enforcing = true;
         try {
-          // Ici, invalide = Non-NPC <-> Non-NPC
-          // On garde le dernier changé, on vide l'autre.
           if (changedId === "destination") {
             pickup.value = "";
             pickup.dispatchEvent(new Event("input", { bubbles: true }));
@@ -666,9 +706,6 @@
             input.id === "destination" ? pickupGroup :
             "";
 
-          // ✅ Restriction UNIQUEMENT si l'autre côté est Non-NPC
-          // - si l'autre = Non-NPC => ici on force NPC (pour éviter Non-NPC <-> Non-NPC)
-          // - si l'autre = NPC => ici on laisse tout (NPC ou Non-NPC) car NPC<->NPC est OK
           const restrictTo =
             otherGroup && otherGroup !== "npc"
               ? "npc"
@@ -741,6 +778,7 @@
         if (!input || !list) return;
 
         const open = () => {
+          if (input.disabled) return; // ✅ bloque ouverture si field lock
           closeAll(field);
           field.classList.add("ddOpen");
           if (search) search.value = "";
@@ -761,12 +799,14 @@
         };
 
         const toggleOpen = () => {
+          if (input.disabled) return; // ✅ bloque toggle si field lock
           if (field.classList.contains("ddOpen")) close();
           else open();
         };
 
         if (toggleBtn) {
           toggleBtn.addEventListener("click", (e) => {
+            if (input.disabled) return; // ✅
             e.preventDefault();
             e.stopPropagation();
             toggleOpen();
@@ -774,6 +814,7 @@
         }
 
         field.addEventListener("pointerdown", (e) => {
+          if (input.disabled) return; // ✅ bloque clic si field lock
           if (e.target.closest(".dd")) return;
           if (e.target.closest(".fieldClear")) return;
           if (e.target.closest(".fieldToggle")) return;
@@ -810,7 +851,6 @@
               pickup.dispatchEvent(new Event("input", { bubbles: true }));
             }
 
-            // ✅ Applique seulement la règle Non-NPC <-> Non-NPC
             enforceRouteRule(input.id);
 
             input.dispatchEvent(new Event("input", { bubbles: true }));
@@ -836,9 +876,14 @@
         if (!e.target.closest("[data-dropdown-field]")) closeAll();
       });
 
-      pickup?.addEventListener("input", refreshAllLists);
+      pickup?.addEventListener("input", () => {
+        syncDestinationLock();
+        refreshAllLists();
+      });
       destination?.addEventListener("input", refreshAllLists);
 
+      // init
+      syncDestinationLock();
       refreshAllLists();
     })();
 
