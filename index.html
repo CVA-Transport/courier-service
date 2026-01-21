@@ -516,12 +516,13 @@
       return LOCATION_GROUP_MAP.get(v) || "";
     };
 
+    // ✅ Nouvelle règle: interdit SEULEMENT Non-NPC <-> Non-NPC
+    // Donc: route valide si au moins un côté est NPC.
     const isRouteValid = (pickupValue, destinationValue) => {
       const pg = getLocationGroup(pickupValue);
       const dg = getLocationGroup(destinationValue);
       if (!pg || !dg) return false;
-      // Strict: one side NPC, other side non-NPC (no NPC<->NPC and no Non-NPC<->Non-NPC)
-      return (pg === "npc" && dg !== "npc") || (pg !== "npc" && dg === "npc");
+      return (pg === "npc" || dg === "npc");
     };
 
     // -------------------------
@@ -537,11 +538,9 @@
 
         const sync = () => field.classList.toggle("hasValue", input.value.trim().length > 0);
 
-        // sync once at init + keep in sync when value changes programmatically
         sync();
         input.addEventListener("input", sync);
 
-        // clear
         clear.addEventListener("click", (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -551,7 +550,6 @@
 
           sync();
 
-          // notify listeners
           input.dispatchEvent(new Event("input", { bubbles: true }));
           if (ddSearch) ddSearch.dispatchEvent(new Event("input", { bubbles: true }));
         });
@@ -598,7 +596,6 @@
           return;
         }
 
-        // Thumb is computed against RAIL height => no overlap with arrow buttons
         const railH = rail.clientHeight;
         const maxScroll = Math.max(1, list.scrollHeight - list.clientHeight);
 
@@ -623,7 +620,8 @@
 
         enforcing = true;
         try {
-          // Keep the last changed field, clear the other
+          // Ici, invalide = Non-NPC <-> Non-NPC
+          // On garde le dernier changé, on vide l'autre.
           if (changedId === "destination") {
             pickup.value = "";
             pickup.dispatchEvent(new Event("input", { bubbles: true }));
@@ -637,9 +635,6 @@
       };
 
       const refreshAllLists = () => {
-        // If both are set but invalid (NPC<->NPC or Non-NPC<->Non-NPC), clear destination by default
-        enforceRouteRule("pickup");
-
         const selectedPickup = norm(pickup?.value);
         const selectedDest = norm(destination?.value);
 
@@ -661,23 +656,22 @@
           const q = norm(search?.value);
           const selfSelected = norm(input.value);
 
-          // existing rule: don't allow selecting the exact same item in both fields
           const forbid =
             input.id === "pickup" ? selectedDest :
             input.id === "destination" ? selectedPickup :
             "";
 
-          // NEW RULE: prevent NullSec<->NullSec and NPC<->NPC
           const otherGroup =
             input.id === "pickup" ? destGroup :
             input.id === "destination" ? pickupGroup :
             "";
 
-          // If the other side is NPC => this side must be non-NPC
-          // If the other side is non-NPC => this side must be NPC
+          // ✅ Restriction UNIQUEMENT si l'autre côté est Non-NPC
+          // - si l'autre = Non-NPC => ici on force NPC (pour éviter Non-NPC <-> Non-NPC)
+          // - si l'autre = NPC => ici on laisse tout (NPC ou Non-NPC) car NPC<->NPC est OK
           const restrictTo =
-            otherGroup
-              ? (otherGroup === "npc" ? "nonNpc" : "npc")
+            otherGroup && otherGroup !== "npc"
+              ? "npc"
               : "any";
 
           const groups = Array.from(list.querySelectorAll(".ddGroup"));
@@ -690,9 +684,8 @@
             const groupAllowed =
               restrictTo === "any"
                 ? true
-                : (restrictTo === "npc" ? groupKey === "npc" : groupKey !== "npc");
+                : (restrictTo === "npc" ? groupKey === "npc" : true);
 
-            // Hide entire groups that are not allowed by route rule
             if (!groupAllowed) {
               group.hidden = true;
               return;
@@ -704,7 +697,6 @@
               const v = norm(btn.dataset.value || btn.textContent || "");
               const matchesQuery = !q || v.includes(q);
 
-              // hide item used by the other field, except if it's the current selection of this field
               const blocked = forbid && v === forbid && v !== selfSelected;
 
               const visible = matchesQuery && !blocked;
@@ -719,15 +711,11 @@
 
             const hasItems = items.length > 0;
 
-            // empty message only for empty groups, only when not searching
             if (empty) empty.hidden = !( !hasItems && !q );
 
-            // group visibility rules
             if (q) {
-              // searching: show only groups with results
               group.hidden = hasItems ? (visibleCount === 0) : true;
             } else {
-              // not searching: show all empty groups (to see categories), show non-empty groups if they have something visible
               if (!hasItems) group.hidden = false;
               else group.hidden = (visibleCount === 0);
             }
@@ -777,7 +765,6 @@
           else open();
         };
 
-        // caret button
         if (toggleBtn) {
           toggleBtn.addEventListener("click", (e) => {
             e.preventDefault();
@@ -786,7 +773,6 @@
           });
         }
 
-        // click on field opens dropdown (search only)
         field.addEventListener("pointerdown", (e) => {
           if (e.target.closest(".dd")) return;
           if (e.target.closest(".fieldClear")) return;
@@ -796,7 +782,6 @@
           open();
         });
 
-        // search inside dropdown only
         if (search) {
           search.addEventListener("input", () => {
             list.scrollTop = 0;
@@ -811,13 +796,11 @@
           });
         }
 
-        // pick item
         items.forEach((btn) => {
           btn.addEventListener("click", () => {
             const val = (btn.dataset.value || btn.textContent || "").trim();
             input.value = val;
 
-            // existing safety: same exact item in both fields
             if (input.id === "pickup" && destination && norm(destination.value) === norm(val)) {
               destination.value = "";
               destination.dispatchEvent(new Event("input", { bubbles: true }));
@@ -827,7 +810,7 @@
               pickup.dispatchEvent(new Event("input", { bubbles: true }));
             }
 
-            // NEW safety: enforce NPC <-> Non-NPC only
+            // ✅ Applique seulement la règle Non-NPC <-> Non-NPC
             enforceRouteRule(input.id);
 
             input.dispatchEvent(new Event("input", { bubbles: true }));
@@ -835,7 +818,6 @@
           });
         });
 
-        // scroll buttons
         const step = 160;
         if (upBtn) upBtn.addEventListener("click", (e) => {
           e.preventDefault();
@@ -850,7 +832,6 @@
         window.addEventListener("resize", () => updateScrollUI(list, rail, upBtn, downBtn, thumb, controls));
       });
 
-      // close on outside click
       document.addEventListener("pointerdown", (e) => {
         if (!e.target.closest("[data-dropdown-field]")) closeAll();
       });
@@ -899,7 +880,6 @@
         if (!(okBasic && okRoute)) resetQuote();
       };
 
-      // when selection changes => hide previous quote (clean UX)
       pickup.addEventListener("input", () => {
         resetQuote();
         syncValidate();
@@ -926,7 +906,6 @@
         priceRow.hidden = false;
       });
 
-      // init
       syncValidate();
     })();
   </script>
