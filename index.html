@@ -782,6 +782,24 @@
         thumb.style.transform = "translateY(" + top + "px)";
       };
 
+      // Keep last chosen location in view when reopening dropdown
+      const scrollToSelection = (list, input) => {
+        if (!list || !input) return;
+        const val = norm(input.value);
+        if (!val) { list.scrollTop = 0; return; }
+
+        const target = Array.from(list.querySelectorAll(".ddItem"))
+          .find((btn) => norm(btn.dataset.value || btn.textContent || "") === val);
+        if (!target) { list.scrollTop = 0; return; }
+
+        const listRect = list.getBoundingClientRect();
+        const itemRect = target.getBoundingClientRect();
+        const offset = itemRect.top - listRect.top + list.scrollTop;
+        const desired = offset - (list.clientHeight / 2) + (itemRect.height / 2);
+        const max = Math.max(0, list.scrollHeight - list.clientHeight);
+        list.scrollTop = Math.min(max, Math.max(0, desired));
+      };
+
       // Enforce route rule by clearing the "other" field when invalid
       let enforcing = false;
       const enforceRouteRule = (changedId) => {
@@ -920,11 +938,11 @@
           closeAll(field);
           field.classList.add("ddOpen");
           if (search) search.value = "";
-          list.scrollTop = 0;
 
           refreshAllLists();
 
           requestAnimationFrame(() => {
+            scrollToSelection(list, input);
             updateScrollUI(list, rail, upBtn, downBtn, thumb, controls);
             if (search) search.focus({ preventScroll: true });
           });
