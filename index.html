@@ -1043,26 +1043,111 @@
 
       if (!pickup || !destination || !validateBtn || !priceRow || !priceText || !copyPriceBtn) return;
 
-      // Detect Amarr <-> Jita routes (case-insensitive)
-      const isAmarrJita = (a, b) => {
-        const A = norm(a);
-        const B = norm(b);
-        const amarr = A.includes("amarr") || B.includes("amarr");
-        const jita  = A.includes("jita")  || B.includes("jita");
-        return amarr && jita;
+      // Canonical NPC endpoints (must match dropdown values exactly)
+      const LOC_JITA  = "Jita 4.4 - Caldary Navy Assembly Plant";
+      const LOC_AMARR = "Amarr VIII - Emperor Family Academy";
+
+      // System pricing (values in millions): { Jita, Amarr }
+      // Note: We price by *system code* (prefix before the first " - ") to keep the table compact.
+      const PRICE_GROUPS = [
+        {
+          jitaM: 50, amarrM: 25,
+          systems: [
+            "KBP7-G", "XHQ-7V", "B-WPLZ", "E-YCML", "Y9-MDG", "K1Y-5H",
+            "IWZ3-C", "N-RMSH", "O-Y5JQ", "9-F0B2", "4B-NQN",
+            "UL-7I8", "ERVK-P",
+          ],
+        },
+        {
+          jitaM: 55, amarrM: 30,
+          systems: [
+            "49GC-R", "U-HYMT", "FC-3YI", "5IO8-U", "QR-K85",
+            "H6-CX8", "Shintaht", "BR-N97", "IS-R7P",
+          ],
+        },
+        {
+          jitaM: 60, amarrM: 35,
+          systems: [
+            "OXIY-V",
+            "H-GKI6", "VKI-T7", "3GXF-U", "8P9-BM",
+            "D-6WS1",
+          ],
+        },
+        {
+          jitaM: 65, amarrM: 40,
+          systems: [
+            "YQB-22", "F-YH5B",
+            "SI-I89", "Z-RFE3",
+          ],
+        },
+        {
+          jitaM: 70, amarrM: 45,
+          systems: [
+            "I-MGAB", "18XA-C",
+          ],
+        },
+      ];
+
+      // Fast lookup: normalized system code -> { jitaM, amarrM }
+      const SYSTEM_PRICE_MAP = (() => {
+        const m = new Map();
+        PRICE_GROUPS.forEach((g) => {
+          g.systems.forEach((sys) => {
+            const key = norm(sys);
+            if (key) m.set(key, { jitaM: g.jitaM, amarrM: g.amarrM });
+          });
+        });
+        return m;
+      })();
+
+      // Format integer ISK with spaces (e.g. 65000000 -> "65 000 000")
+      const formatISK = (amount) => String(amount).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+
+      // Extract system code from a dropdown value (prefix before first " - ")
+      const getSystemCode = (locationValue) => {
+        const raw = String(locationValue || "").trim();
+        const parts = raw.split(" - ");
+        return norm(parts[0] || "");
       };
 
-      // Copy price shortcut (when available)
-      bindCopyButton(copyPriceBtn, () => "65 000 000");
+      // Compute route price (returns integer ISK or null)
+      const getRoutePrice = (a, b) => {
+        const A = norm(a);
+        const B = norm(b);
 
-      // Reset quote UI
+        const J  = norm(LOC_JITA);
+        const AM = norm(LOC_AMARR);
+
+        const hasJita  = A === J  || B === J;
+        const hasAmarr = A === AM || B === AM;
+
+        // NPC <-> NPC special case (Jita <-> Amarr)
+        if (hasJita && hasAmarr) return 65 * 1_000_000;
+
+        // With current rule, at least one endpoint must be NPC
+        if (!hasJita && !hasAmarr) return null;
+
+        const other = hasJita ? (A === J ? b : a) : (A === AM ? b : a);
+        const sysKey = getSystemCode(other);
+
+        const entry = SYSTEM_PRICE_MAP.get(sysKey);
+        if (!entry) return null;
+
+        const m = hasJita ? entry.jitaM : entry.amarrM;
+        return m * 1_000_000;
+      };
+
+      // Dynamic copy value (updated on each quote)
+      let lastCopyValue = "";
+      bindCopyButton(copyPriceBtn, () => lastCopyValue);
+
       const resetQuote = () => {
         priceRow.hidden = true;
         copyPriceBtn.disabled = true;
         priceText.textContent = "—";
+        lastCopyValue = "";
       };
 
-      // Enable/disable Validate based on selections + route rule
       const syncValidate = () => {
         const okBasic = pickup.value.trim().length > 0 && destination.value.trim().length > 0;
         const okRoute = okBasic && isRouteValid(pickup.value, destination.value);
@@ -1075,22 +1160,26 @@
         resetQuote();
         syncValidate();
       });
+
       destination.addEventListener("input", () => {
         resetQuote();
         syncValidate();
       });
 
-      // Compute and show the price on demand
       validateBtn.addEventListener("click", () => {
         if (validateBtn.disabled) return;
 
         const p = pickup.value.trim();
         const d = destination.value.trim();
 
-        if (isAmarrJita(p, d)) {
-          priceText.textContent = "65 000 000 ISK";
+        const amount = getRoutePrice(p, d);
+
+        if (amount != null) {
+          lastCopyValue = formatISK(amount);
+          priceText.textContent = lastCopyValue + " ISK";
           copyPriceBtn.disabled = false;
         } else {
+          lastCopyValue = "";
           priceText.textContent = "Pricing unavailable";
           copyPriceBtn.disabled = true;
         }
