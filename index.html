@@ -495,6 +495,36 @@
     const norm = (s) => (s || "").trim().toLowerCase();
 
     // -------------------------
+    // Location grouping helpers (NPC vs Non-NPC)
+    // -------------------------
+    const buildLocationGroupMap = () => {
+      const m = new Map();
+      document.querySelectorAll(".ddItem").forEach((btn) => {
+        const v = norm(btn.dataset.value || btn.textContent || "");
+        const g = btn.closest(".ddGroup")?.dataset.group || "";
+        if (v && g && !m.has(v)) m.set(v, g);
+      });
+      return m;
+    };
+
+    let LOCATION_GROUP_MAP = null;
+
+    const getLocationGroup = (value) => {
+      const v = norm(value || "");
+      if (!v) return "";
+      if (!LOCATION_GROUP_MAP) LOCATION_GROUP_MAP = buildLocationGroupMap();
+      return LOCATION_GROUP_MAP.get(v) || "";
+    };
+
+    const isRouteValid = (pickupValue, destinationValue) => {
+      const pg = getLocationGroup(pickupValue);
+      const dg = getLocationGroup(destinationValue);
+      if (!pg || !dg) return false;
+      // Strict: one side NPC, other side non-NPC (no NPC<->NPC and no Non-NPC<->Non-NPC)
+      return (pg === "npc" && dg !== "npc") || (pg !== "npc" && dg === "npc");
+    };
+
+    // -------------------------
     // Clear buttons visibility
     // -------------------------
     (function () {
@@ -507,8 +537,9 @@
 
         const sync = () => field.classList.toggle("hasValue", input.value.trim().length > 0);
 
-        // readonly: we still sync once at init
+        // sync once at init + keep in sync when value changes programmatically
         sync();
+        input.addEventListener("input", sync);
 
         // clear
         clear.addEventListener("click", (e) => {
@@ -536,7 +567,7 @@
     })();
 
     // -------------------------
-    // Dropdowns + mutual exclusion + scroll thumb
+    // Dropdowns + mutual exclusion + route restriction + scroll thumb
     // -------------------------
     (function () {
       const fields = Array.from(document.querySelectorAll("[data-dropdown-field]"));
@@ -579,9 +610,41 @@
         thumb.style.transform = "translateY(" + top + "px)";
       };
 
+      let enforcing = false;
+      const enforceRouteRule = (changedId) => {
+        if (enforcing) return;
+        if (!pickup || !destination) return;
+
+        const p = pickup.value.trim();
+        const d = destination.value.trim();
+        if (!p || !d) return;
+
+        if (isRouteValid(p, d)) return;
+
+        enforcing = true;
+        try {
+          // Keep the last changed field, clear the other
+          if (changedId === "destination") {
+            pickup.value = "";
+            pickup.dispatchEvent(new Event("input", { bubbles: true }));
+          } else {
+            destination.value = "";
+            destination.dispatchEvent(new Event("input", { bubbles: true }));
+          }
+        } finally {
+          enforcing = false;
+        }
+      };
+
       const refreshAllLists = () => {
+        // If both are set but invalid (NPC<->NPC or Non-NPC<->Non-NPC), clear destination by default
+        enforceRouteRule("pickup");
+
         const selectedPickup = norm(pickup?.value);
         const selectedDest = norm(destination?.value);
+
+        const pickupGroup = getLocationGroup(pickup?.value);
+        const destGroup = getLocationGroup(destination?.value);
 
         fields.forEach((field) => {
           const input = field.querySelector(".fieldInput");
@@ -598,16 +661,42 @@
           const q = norm(search?.value);
           const selfSelected = norm(input.value);
 
+          // existing rule: don't allow selecting the exact same item in both fields
           const forbid =
             input.id === "pickup" ? selectedDest :
             input.id === "destination" ? selectedPickup :
             "";
 
+          // NEW RULE: prevent NullSec<->NullSec and NPC<->NPC
+          const otherGroup =
+            input.id === "pickup" ? destGroup :
+            input.id === "destination" ? pickupGroup :
+            "";
+
+          // If the other side is NPC => this side must be non-NPC
+          // If the other side is non-NPC => this side must be NPC
+          const restrictTo =
+            otherGroup
+              ? (otherGroup === "npc" ? "nonNpc" : "npc")
+              : "any";
+
           const groups = Array.from(list.querySelectorAll(".ddGroup"));
 
           groups.forEach((group) => {
+            const groupKey = group.dataset.group || "";
             const items = Array.from(group.querySelectorAll(".ddItem"));
             const empty = group.querySelector(".ddEmpty");
+
+            const groupAllowed =
+              restrictTo === "any"
+                ? true
+                : (restrictTo === "npc" ? groupKey === "npc" : groupKey !== "npc");
+
+            // Hide entire groups that are not allowed by route rule
+            if (!groupAllowed) {
+              group.hidden = true;
+              return;
+            }
 
             let visibleCount = 0;
 
@@ -728,7 +817,7 @@
             const val = (btn.dataset.value || btn.textContent || "").trim();
             input.value = val;
 
-            // safety (should not happen often because it's hidden in the other list)
+            // existing safety: same exact item in both fields
             if (input.id === "pickup" && destination && norm(destination.value) === norm(val)) {
               destination.value = "";
               destination.dispatchEvent(new Event("input", { bubbles: true }));
@@ -737,6 +826,9 @@
               pickup.value = "";
               pickup.dispatchEvent(new Event("input", { bubbles: true }));
             }
+
+            // NEW safety: enforce NPC <-> Non-NPC only
+            enforceRouteRule(input.id);
 
             input.dispatchEvent(new Event("input", { bubbles: true }));
             close();
@@ -800,9 +892,11 @@
       };
 
       const syncValidate = () => {
-        const ok = pickup.value.trim().length > 0 && destination.value.trim().length > 0;
-        validateBtn.disabled = !ok;
-        if (!ok) resetQuote();
+        const okBasic = pickup.value.trim().length > 0 && destination.value.trim().length > 0;
+        const okRoute = okBasic && isRouteValid(pickup.value, destination.value);
+
+        validateBtn.disabled = !(okBasic && okRoute);
+        if (!(okBasic && okRoute)) resetQuote();
       };
 
       // when selection changes => hide previous quote (clean UX)
@@ -834,7 +928,6 @@
 
       // init
       syncValidate();
-      // with defaults, validate becomes enabled; quote stays hidden until click
     })();
   </script>
 </body>
